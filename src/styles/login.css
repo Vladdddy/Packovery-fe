@@ -190,6 +190,7 @@
                 font-size: var(--paragraph-l);
                 border: 1px solid var(--light-grey);
                 border-radius: 8px;
+                padding: 0;
 
                 &:focus {
                     outline: none;
