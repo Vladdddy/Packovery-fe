@@ -27,8 +27,36 @@
     --grey: #75757d;
     --light-grey: #e4e4e7;
     --light: #f7f7f7;
+    --red: #f24916;
+    --red-10: #f249161a;
+    --bento-bg: #f8f9fa;
+    --bento-stroke: #dee2e6;
 }
 
 body {
     font-family: "Nunito Sans", sans-serif;
+}
+
+.layout {
+    display: flex;
+}
+
+.page-content {
+    flex: 1;
+}
+
+.btn {
+    width: 200px;
+    height: 40px;
+    background-color: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-size: var(--paragraph-m);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: var(--primary-hover);
+    }
 }

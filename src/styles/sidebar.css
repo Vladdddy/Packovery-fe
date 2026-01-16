@@ -1,0 +1,69 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: space-between;
+    width: 250px;
+    height: 100vh;
+    background-color: var(--bento-bg);
+    border-right: 1px solid var(--bento-stroke);
+    padding: 20px;
+
+    & img {
+        margin: 0 auto;
+        width: 80%;
+        margin-top: 1rem;
+    }
+
+    & .sidebar-content {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        width: 100%;
+        flex: 1;
+        margin-top: 4rem;
+        gap: 4px;
+
+        & h4 {
+            margin-bottom: 1rem;
+            color: var(--grey);
+            font-size: var(--paragraph-xs);
+        }
+    }
+
+    & a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--grey);
+        padding: 10px;
+        width: 100%;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        font-size: var(--paragraph-m);
+
+        & svg {
+            width: 24px;
+            stroke-width: 2px;
+        }
+
+        &:hover {
+            background-color: var(--light-grey);
+            color: var(--black);
+        }
+    }
+
+    .logout-link {
+        &:hover {
+            background-color: var(--red-10);
+            color: var(--red);
+        }
+    }
+
+    .active {
+        background-color: var(--light-grey);
+        color: var(--black);
+    }
+}
