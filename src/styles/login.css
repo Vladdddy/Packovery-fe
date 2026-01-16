@@ -93,6 +93,7 @@
 
                         & svg {
                             display: block;
+                            stroke-width: 1.2px;
                         }
                     }
                 }

@@ -1,0 +1,15 @@
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: var(--bento-bg);
+    border-bottom: 1px solid var(--bento-stroke);
+    flex: 1;
+    min-height: 80px;
+
+    & h1 {
+        font-size: var(--title-m);
+        color: var(--black);
+    }
+}
