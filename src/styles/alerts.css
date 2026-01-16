@@ -1,0 +1,360 @@
+/* --- Figma Button Style --- */
+.frame-btn {
+	padding: 8px 20px;
+	border-radius: 100px;
+	outline: 1px solid var(--grey);
+	outline-offset: -1px;
+	background: var(--white);
+	color: var(--black);
+	font-family: 'Nunito Sans', Arial, sans-serif;
+	font-size: 16px;
+	font-weight: 400;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	border: none;
+	cursor: pointer;
+	transition: background 0.15s, outline-color 0.15s;
+}
+.frame-btn:hover {
+	background: var(--light-grey);
+	outline-color: var(--primary);
+}
+/* Make the create button more prominent on larger viewports */
+.frame-btn.create-full-mobile {
+	background: var(--primary);
+	color: var(--white);
+	border: none;
+	box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+	padding: 10px 28px;
+	font-weight: 700;
+}
+.frame-btn.create-full-mobile:hover {
+	filter: brightness(0.95);
+}
+.btn-label {
+	text-align: center;
+	color: var(--black);
+	font-size: 16px;
+	font-family: 'Nunito Sans', Arial, sans-serif;
+	font-weight: 400;
+}
+
+/* Ensure create button label and icon are white when emphasized */
+.frame-btn.create-full-mobile .btn-label { color: var(--white) !important; }
+.frame-btn.create-full-mobile svg path { stroke: var(--white) !important; }
+.btn-icon {
+	display: flex;
+	align-items: center;
+}
+/* Responsive frame button sizing */
+@media (max-width: 900px) {
+	.frame-btn { padding: 6px 18px; font-size: 15px; }
+	.frame-btn svg { width: 16px; height: 16px; }
+}
+@media (max-width: 480px) {
+	.frame-btn { padding: 6px 12px; font-size: 14px; }
+	.frame-btn svg { width: 14px; height: 14px; }
+}
+
+/* Mobile: icon-only filled buttons */
+@media (max-width: 480px) {
+	.frame-btn {
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		padding: 8px 10px; /* smaller horizontal padding to reduce length */
+		background: var(--primary);
+		color: var(--white);
+		border-radius: 12px;
+		outline: none;
+		width: auto; /* do not force full width on mobile */
+		min-width: 44px;
+	}
+	.frame-btn .btn-label { display: none; }
+	.frame-btn svg { width: 18px; height: 18px; }
+	.frame-btn svg path { stroke: var(--white) !important; }
+
+	/* Exception: make the create button full-width on mobile */
+	.frame-btn.create-full-mobile {
+		width: 100%;
+		min-width: 0;
+		padding: 12px 0; /* taller touch target */
+		border-radius: 12px;
+	}
+	.frame-btn.create-full-mobile .btn-label { display: inline-block; color: var(--white); }
+}
+/* --- Custom Table (Figma) --- */
+.tabella-mezzi {
+	width: 100%;
+	max-width: 100%;
+	display: block;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+.tabella-mezzi {
+	/* container provides the rounded border so inner elements can be plain
+	   Keep horizontal scrolling enabled while clipping vertical overflow so
+	   the rounded corners remain visible. */
+	border-radius: 18px;
+	border: 1px solid var(--light-grey);
+	overflow-x: auto;
+	overflow-y: hidden;
+	-webkit-overflow-scrolling: touch;
+}
+
+.intestazione-tabella {
+	width: 100%;
+	display: inline-grid; /* keep full-width columns and allow parent to scroll */
+	grid-template-columns: 18rem 18rem 20rem 11rem 14rem 9rem;
+	align-items: center;
+	padding: 24px 16px;
+	background: var(--light-grey);
+	/* header visual only; container handles rounding/border */
+	border: none;
+	min-width: max-content; /* ensure columns don't collapse */
+}
+.intestazione-col {
+	font-size: 24px; /* header column font size requirement */
+	font-weight: 600;
+	color: var(--black);
+	font-family: 'Nunito Sans', Arial, sans-serif;
+	display: flex;
+	align-items: center;
+}
+.righe-tabella {
+	width: 100%;
+	display: inline-grid; /* match header layout and keep native width */
+	grid-template-columns: 18rem 18rem 20rem 11rem 14rem 9rem;
+	align-items: center;
+	padding: 24px 16px;
+	/* keep only the top border for row separation; container has outer border */
+	border-left: none;
+	border-right: none;
+	border-top: 1px solid var(--light-grey);
+	background: var(--white);
+	min-width: max-content;
+}
+.righe-tabella-last {
+	/* container handles bottom rounding; avoid adding extra outlines here */
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+	outline: none;
+}
+.righe-frame {
+	display: contents; /* let children participate in parent grid */
+}
+.nome-campo {
+	font-size: 18px; /* column informations font size requirement */
+	color: var(--black);
+	font-family: 'Nunito Sans', Arial, sans-serif;
+	font-weight: 400;
+	display: flex;
+	align-items: center;
+}
+
+/* default cell padding and alignment so header & rows align */
+.intestazione-col, .nome-campo {
+	padding: 0 8px;
+	justify-content: flex-start;
+	text-align: left;
+}
+
+/* center numeric / short columns (Soglia, Stato) so header and values align centered */
+.intestazione-tabella .intestazione-col:nth-child(4),
+.righe-tabella .nome-campo:nth-child(4),
+.intestazione-tabella .intestazione-col:nth-child(5),
+.righe-tabella .nome-campo:nth-child(5) {
+	justify-content: center;
+	text-align: center;
+}
+
+/* ensure actions column content (icons) is right aligned */
+.intestazione-tabella .actions-col,
+.righe-tabella .icons {
+	justify-self: end;
+	padding-right: 8px;
+}
+.w-72 { width: 18rem; min-width: 120px; }
+.w-80 { width: 20rem; min-width: 120px; }
+.w-44 { width: 11rem; min-width: 80px; }
+.w-56 { width: 14rem; min-width: 100px; }
+.icons {
+	display: flex;
+	align-items: center;
+	gap: 28px;
+	justify-self: end; /* keep icons aligned to the rightmost column */
+}
+.icon-btn {
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	transition: opacity 0.2s;
+}
+.icon-btn:hover {
+	opacity: 0.7;
+}
+/* ensure svg icons are 24x24 */
+.icons svg { width: 24px; height: 24px; }
+@media (max-width: 900px) {
+	.tabella-mezzi, .intestazione-tabella, .righe-tabella, .righe-frame {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 6px;
+	}
+	.intestazione-tabella, .righe-tabella {
+		padding: 16px 8px;
+	}
+	.w-72, .w-80, .w-44, .w-56 {
+		width: 100%;
+		min-width: 0;
+	}
+	.icons {
+		gap: 16px;
+	}
+}
+/* Colors and spacing rely on variables defined in index.css */
+.pv-page { display: flex; min-height: 100vh; background: var(--white); color: var(--black); }
+.pv-sidebar {
+	width: 240px;
+	background: var(--light);
+	padding: 24px;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: 12px;
+}
+.pv-avatar { width:64px; height:64px; background:var(--grey); border-radius:12px; margin-bottom:8px; }
+
+.pv-nav { display:flex; flex-direction:column; gap:10px; margin-top:20px; }
+.pv-link { padding:12px 14px; border-radius:8px; color:var(--black); text-decoration:none; background:transparent; display:inline-block; font-weight:600; }
+.pv-link.active { background: var(--primary-light); color:var(--black); }
+
+.pv-footer { margin-top:20px; }
+.pv-logout { background:var(--white); border:1px solid var(--light-grey); padding:10px; border-radius:8px; cursor:pointer; }
+
+/* Figma-like sidebar */
+.figma-sidebar {
+	width: 260px;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	gap: 24px;
+	box-sizing: border-box;
+}
+.sidebar-logo {
+	width: 72px;
+	height: 72px;
+	object-fit: contain;
+	align-self: center;
+	border-radius: 8px;
+}
+.sidebar-items {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+.sidebar-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px;
+	border-radius: 8px;
+	background: var(--white);
+	color: var(--black);
+	text-decoration: none;
+}
+.sidebar-item .icon-wrap { width: 24px; height: 24px; display:flex; align-items:center; justify-content:center; }
+.sidebar-label { font-size: 16px; font-weight: 600; }
+.sidebar-item.active { background: var(--black); color: var(--white); }
+.sidebar-item.active svg path { stroke: var(--white) !important; }
+
+@media (max-width: 900px) {
+	.figma-sidebar { display:none; }
+}
+
+.pv-main { flex:1; padding:32px 48px; }
+.pv-main-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; gap:12px; }
+.pv-main-header h1 { font-size: var(--title-m); color: var(--black); }
+.pv-btn { padding:6px 12px; border-radius:14px; border:none; cursor:pointer; font-weight:600; font-size:14px; }
+.pv-btn.primary { background:var(--primary); color:var(--white); }
+.pv-btn.ghost { background:transparent; border:1px solid var(--light-grey); color:var(--black); }
+
+.pv-table-wrap { width:100%; overflow:auto; }
+.pv-table { width:100%; border-collapse:collapse; background:var(--white); box-shadow: 0 0 0 1px rgba(0,0,0,0.04); border-radius:8px; overflow:hidden; }
+.pv-table th, .pv-table td { padding:14px 16px; text-align:left; border-bottom:1px solid var(--light); font-size:14px; }
+.pv-table thead th { background:transparent; font-weight:700; color:var(--grey); }
+.pv-action { border:none; background:transparent; cursor:pointer; padding:6px; margin-right:6px; }
+
+.pv-form { max-width:720px; margin-top:10px; display:block; }
+.pv-label { display:block; margin-top:12px; font-weight:700; margin-bottom:6px; color:var(--black); }
+.pv-input, .pv-textarea, .pv-select { width:100%; padding:10px 12px; border:1px solid var(--light-grey); border-radius:8px; box-sizing:border-box; background:var(--white); font-size:14px; color:var(--black); }
+.pv-textarea { min-height:100px; resize:vertical; }
+
+.pv-select { position:relative; cursor:pointer; }
+.pv-select-value { min-height:40px; display:flex; align-items:center; }
+.pv-select-list { position:absolute; left:0; right:0; top:48px; background:var(--white); border:1px solid var(--light-grey); border-radius:8px; z-index:20; padding:6px 0; box-shadow:0 6px 12px rgba(0,0,0,0.06); }
+.pv-select-list li { padding:10px 12px; cursor:pointer; font-size:14px; }
+.pv-select-list li:hover { background:var(--light); }
+
+.pv-time-row { display:flex; gap:12px; align-items:center; margin-top:6px; }
+.pv-time-btns { display:flex; gap:8px; }
+.pv-small {
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	height:40px; /* match pv-select / pv-input height */
+	min-width:64px; /* slightly longer */
+	padding:0 12px; /* horizontal padding only since height is fixed */
+	border-radius:8px;
+	border:1px solid var(--light-grey);
+	background:var(--white);
+	cursor:pointer;
+	font-size:14px;
+	box-sizing:border-box;
+}
+
+@media (max-width: 900px) {
+	.pv-small { height:36px; min-width:56px; font-size:13px; }
+}
+
+@media (max-width: 480px) {
+	.pv-small { height:32px; min-width:48px; font-size:13px; }
+}
+
+.pv-toggle-row { display:flex; gap:12px; align-items:center; margin-top:6px; }
+
+/* Align toggle and action buttons on a single row; button right-aligned */
+.pv-form-actions {
+	display:flex;
+	justify-content:space-between;
+	align-items:center;
+	margin-top:20px;
+	gap:16px;
+}
+.pv-form-actions > div:last-child { display:flex; align-items:center; }
+@media (max-width: 600px) {
+	.pv-form-actions { flex-direction:column; align-items:flex-start; gap:10px; }
+	.pv-form-actions > div:last-child { width:100%; }
+	.pv-form-actions .frame-btn, .pv-form-actions .pv-btn { width:100%; }
+}
+.pv-switch { position:relative; display:inline-block; width:42px; height:26px; }
+.pv-switch input { opacity:0; width:0; height:0; }
+.pv-slider { position:absolute; cursor:pointer; top:2px; left:2px; right:2px; bottom:2px; background:var(--light-grey); border-radius:20px; transition:.2s; }
+.pv-switch input:checked + .pv-slider { background:var(--primary); }
+.pv-slider::before { content:""; position:absolute; height:18px; width:18px; left:3px; bottom:3px; background:var(--white); border-radius:50%; transition:.2s; }
+.pv-switch input:checked + .pv-slider::before { transform:translateX(16px); }
+
+/* responsiveness */
+@media (max-width: 900px) {
+	.pv-sidebar { display:none; }
+	.pv-page { display:block; }
+	.pv-main { padding:20px; }
+	.pv-form { padding-bottom:40px; }
+	.pv-table th, .pv-table td { padding:10px 8px; font-size:13px; }
+}

@@ -6,6 +6,8 @@ import Alerts from "./pages/Alerts";
 import Login from "./pages/Login";
 import Reports from "./pages/Reports";
 import LoginRecovery from "./pages/LoginRecovery";
+import CreateAlert from "./pages/CreateAlert";
+import EditAlert from "./pages/EditAlert";
 
 function App() {
     return (
@@ -13,6 +15,8 @@ function App() {
             <Routes>
                 <Route path="/" element={<Orders />} />
                 <Route path="/alerts" element={<Alerts />} />
+                <Route path="/alerts/create" element={<CreateAlert />} />
+                <Route path="/alerts/:id/edit" element={<EditAlert />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/recovery" element={<LoginRecovery />} />
