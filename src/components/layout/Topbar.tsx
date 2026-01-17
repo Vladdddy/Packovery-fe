@@ -1,4 +1,5 @@
 import "../../styles/topbar.css";
+import MenuIcon from "../../assets/icons/menu.tsx";
 
 function Topbar({
     header,
@@ -10,14 +11,27 @@ function Topbar({
     onClick?: () => void;
 }) {
     return (
-        <div className="topbar">
-            <h1>{header}</h1>
-            {btn !== null ? (
-                <button className="btn" onClick={onClick}>
-                    {btn}
-                </button>
-            ) : null}
-        </div>
+        <>
+            <div className="topbar-pc">
+                <div className="left">
+                    <h1>{header}</h1>
+                </div>
+                {btn !== null ? (
+                    <button className="btn" onClick={onClick}>
+                        {btn}
+                    </button>
+                ) : null}
+            </div>
+
+            <div className="topbar-mobile">
+                <div className="left">
+                    <div className="burger-menu">
+                        <MenuIcon />
+                    </div>
+                    <h1>{header}</h1>
+                </div>
+            </div>
+        </>
     );
 }
 
