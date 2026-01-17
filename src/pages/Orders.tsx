@@ -7,7 +7,7 @@ function Orders() {
         <section className="layout">
             <Sidebar currentPage="orders" />
             <div className="page-content">
-                <Topbar header="Ricerca Ordine" btn="Cerca" />
+                <Topbar header="Ricerca Ordine" btn="Cerca Ordine" />
                 <div className="orders-page"></div>
             </div>
         </section>
