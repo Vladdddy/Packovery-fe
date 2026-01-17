@@ -1,10 +1,10 @@
-import "../styles/sidebar.css";
-import Logo from "../../public/packovery-full-logo.png";
+import "../../styles/sidebar.css";
+import Logo from "../../../public/packovery-full-logo.png";
 import { Link } from "react-router-dom";
-import OrdersIcon from "../assets/icons/orders.tsx";
-import LogoutIcon from "../assets/icons/logout.tsx";
-import WarningIcon from "../assets/icons/warning.tsx";
-import AlertIcon from "../assets/icons/alert.tsx";
+import OrdersIcon from "../../assets/icons/orders.tsx";
+import LogoutIcon from "../../assets/icons/logout.tsx";
+import WarningIcon from "../../assets/icons/warning.tsx";
+import AlertIcon from "../../assets/icons/alert.tsx";
 
 function Sidebar({ currentPage }: { currentPage: string }) {
     return (

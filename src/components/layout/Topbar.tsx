@@ -1,4 +1,4 @@
-import "../styles/topbar.css";
+import "../../styles/topbar.css";
 
 function Topbar({
     header,

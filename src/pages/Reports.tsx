@@ -1,6 +1,6 @@
 import "../styles/reports.css";
-import Sidebar from "../components/Sidebar";
-import Topbar from "../components/Topbar";
+import Sidebar from "../components/layout/Sidebar";
+import Topbar from "../components/layout/Topbar";
 
 function Reports() {
     return (

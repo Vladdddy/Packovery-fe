@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../components/layout/Sidebar";
 import "../styles/alerts.css";
-import Topbar from "../components/Topbar";
+import Topbar from "../components/layout/Topbar";
 
 const TYPES = [
     "Ritardo partenza ordine",
