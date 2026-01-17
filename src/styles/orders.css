@@ -4,6 +4,11 @@
     overflow: hidden;
 }
 
+.btn-mobile {
+    display: none;
+    margin-bottom: 20px;
+}
+
 .orders-table-container {
     background: var(--white);
     border-radius: 10px;
@@ -179,6 +184,11 @@
         height: calc(100vh - 20vh);
     }
 
+    .btn-mobile {
+        display: block;
+        width: 100%;
+    }
+
     .orders-table th,
     .orders-table td {
         padding: 12px 10px;
@@ -198,5 +208,9 @@
         min-width: 30px;
         height: 30px;
         font-size: var(--paragraph-xs);
+    }
+
+    .orders-table-container {
+        height: 80%;
     }
 }

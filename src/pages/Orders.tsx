@@ -10,6 +10,7 @@ function Orders() {
             <div className="page-content">
                 <Topbar header="Ricerca Ordine" btn="Cerca Ordine" />
                 <div className="orders-page">
+                    <button className="btn btn-mobile">Cerca Ordine</button>
                     <OrdersTable />
                 </div>
             </div>
