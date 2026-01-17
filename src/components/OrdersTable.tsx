@@ -150,44 +150,46 @@ function OrdersTable() {
 
     return (
         <div className="orders-table-container">
-            <table className="orders-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Stato</th>
-                        <th>Partenza</th>
-                        <th>Destinazione</th>
-                        <th>Data</th>
-                        <th>Peso</th>
-                        <th>Dimensione</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {orders.map((order) => (
-                        <tr key={order.id}>
-                            <td>{order.id}</td>
-                            <td>
-                                <span
-                                    className={`status ${order.stato.toLowerCase().replace(" ", "-")}`}
-                                >
-                                    {order.stato}
-                                </span>
-                            </td>
-                            <td>{order.partenza}</td>
-                            <td>{order.destinazione}</td>
-                            <td>{order.data}</td>
-                            <td>{order.peso}</td>
-                            <td>{order.dimensione}</td>
-                            <td>
-                                <button className="detail-button">
-                                    <InfoIcon />
-                                </button>
-                            </td>
+            <div className="orders-table-wrapper">
+                <table className="orders-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Stato</th>
+                            <th>Partenza</th>
+                            <th>Destinazione</th>
+                            <th>Data</th>
+                            <th>Peso</th>
+                            <th>Dimensione</th>
+                            <th></th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {orders.map((order) => (
+                            <tr key={order.id}>
+                                <td>{order.id}</td>
+                                <td>
+                                    <span
+                                        className={`status ${order.stato.toLowerCase().replace(" ", "-")}`}
+                                    >
+                                        {order.stato}
+                                    </span>
+                                </td>
+                                <td>{order.partenza}</td>
+                                <td>{order.destinazione}</td>
+                                <td>{order.data}</td>
+                                <td>{order.peso}</td>
+                                <td>{order.dimensione}</td>
+                                <td>
+                                    <button className="detail-button">
+                                        <InfoIcon />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             <div className="pagination">
                 <button
