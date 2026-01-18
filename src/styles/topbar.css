@@ -88,6 +88,7 @@
                 cursor: pointer;
                 border: 1px solid var(--bento-stroke);
                 background-color: var(--bento-bg);
+                opacity: 0;
 
                 & svg {
                     width: 24px;

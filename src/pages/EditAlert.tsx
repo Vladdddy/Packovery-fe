@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../components/layout/Sidebar";
 import "../styles/alerts.css";
 import Topbar from "../components/layout/Topbar";
+import BackArrow from "../assets/icons/back-arrow";
 
 const TYPES = [
     "Ritardo partenza ordine",
@@ -54,50 +55,17 @@ export default function EditAlert() {
 
                 <main className="pv-main">
                     <div className="pv-main-header">
-                        <h1>Modifica alert</h1>
                         <button
-                            className="frame-btn"
+                            type="button"
+                            className="secondary-btn"
                             onClick={() => navigate(-1)}
                         >
-                            <span className="btn-label">Torna indietro</span>
-                            <span className="btn-icon">
-                                <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 20 20"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M7.5 10H17"
-                                        stroke="var(--black)"
-                                        strokeWidth="1.2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                    <path
-                                        d="M7.5 10L11.25 13.75"
-                                        stroke="var(--black)"
-                                        strokeWidth="1.2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                    <path
-                                        d="M7.5 10L11.25 6.25"
-                                        stroke="var(--black)"
-                                        strokeWidth="1.2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
-                            </span>
+                            <BackArrow />
+                            Torna indietro
                         </button>
                     </div>
 
                     <section className="pv-form">
-                        <label className="pv-label">ID alert</label>
-                        <input className="pv-input" value={id || ""} readOnly />
-
                         <label className="pv-label">Tipologia</label>
                         <select
                             className="pv-input"
@@ -172,13 +140,8 @@ export default function EditAlert() {
                             </div>
 
                             <div>
-                                <button
-                                    className="frame-btn create-full-mobile"
-                                    onClick={submit}
-                                >
-                                    <span className="btn-label">
-                                        Modifica alert
-                                    </span>
+                                <button className="btn" onClick={submit}>
+                                    Modifica Alert
                                 </button>
                             </div>
                         </div>
