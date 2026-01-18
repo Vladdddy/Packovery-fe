@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../styles/orders.css";
 import InfoIcon from "../assets/icons/info.tsx";
 
@@ -14,6 +14,7 @@ interface Order {
 
 function OrdersTable() {
     const [currentPage, setCurrentPage] = useState(1);
+    const [hasAnimated, setHasAnimated] = useState(false);
     const totalPages = 10;
 
     // Sample data matching the image
@@ -110,6 +111,11 @@ function OrdersTable() {
         },
     ];
 
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setHasAnimated(true);
+    }, []);
+
     const handlePageChange = (page: number) => {
         if (page >= 1 && page <= totalPages) {
             setCurrentPage(page);
@@ -149,7 +155,9 @@ function OrdersTable() {
     };
 
     return (
-        <div className="orders-table-container">
+        <div
+            className={`orders-table-container ${hasAnimated ? "animate-in" : ""}`}
+        >
             <div className="orders-table-wrapper">
                 <table className="orders-table">
                     <thead>
@@ -165,8 +173,16 @@ function OrdersTable() {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map((order) => (
-                            <tr key={order.id}>
+                        {orders.map((order, index) => (
+                            <tr
+                                key={order.id}
+                                className={hasAnimated ? "animate-row" : ""}
+                                style={
+                                    hasAnimated
+                                        ? { animationDelay: `${index * 0.1}s` }
+                                        : {}
+                                }
+                            >
                                 <td>{order.id}</td>
                                 <td>
                                     <span

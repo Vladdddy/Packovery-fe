@@ -1,5 +1,5 @@
 import "../styles/alerts.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "../assets/icons/edit.tsx";
 import DeleteIcon from "../assets/icons/bin.tsx";
@@ -16,6 +16,7 @@ interface Alerts {
 function AlertsTable() {
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
+    const [hasAnimated, setHasAnimated] = useState(false);
     const totalPages = 2;
 
     const [alerts, setAlerts] = useState<Alerts[]>([
@@ -44,6 +45,10 @@ function AlertsTable() {
             state: "Attivo",
         },
     ]);
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setHasAnimated(true);
+    }, []);
 
     const toggleAlertState = (alertId: string) => {
         setAlerts((prevAlerts) =>
@@ -94,12 +99,17 @@ function AlertsTable() {
             pages.push("...");
             pages.push(totalPages);
         }
-
+        {
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            `alerts-table-container ${hasAnimated ? "animate-in" : ""}`;
+        }
         return pages;
     };
 
     return (
-        <div className="alerts-table-container">
+        <div
+            className={`alerts-table-container ${hasAnimated ? "animate-in" : ""}`}
+        >
             <div className="alerts-table-wrapper">
                 <table className="alerts-table">
                     <thead>
@@ -113,8 +123,16 @@ function AlertsTable() {
                         </tr>
                     </thead>
                     <tbody>
-                        {alerts.map((a) => (
-                            <tr key={a.id}>
+                        {alerts.map((a, index) => (
+                            <tr
+                                key={a.id}
+                                className={hasAnimated ? "animate-row" : ""}
+                                style={
+                                    hasAnimated
+                                        ? { animationDelay: `${index * 0.1}s` }
+                                        : {}
+                                }
+                            >
                                 <td>{a.name}</td>
                                 <td>{a.created}</td>
                                 <td>{a.type}</td>
