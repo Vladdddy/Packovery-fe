@@ -48,7 +48,7 @@ export default function EditAlert() {
       <Sidebar currentPage="alerts" />
       <div className="page-content">
         <Topbar
-          header="Configuratore Alert"
+          header="Modifica Alert"
           btn="Crea Alert"
           onClick={() => navigate("/alerts/create")}
         />
