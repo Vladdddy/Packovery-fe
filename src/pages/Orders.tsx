@@ -11,9 +11,18 @@ function Orders() {
     <section className="layout">
       <Sidebar currentPage="orders" />
       <div className="page-content">
-        <Topbar header="Ricerca Ordine" btn="Cerca Ordine" />
+        <Topbar
+          header="Ricerca Ordine"
+          btn="Cerca Ordine"
+          onClick={() => navigate("/search-order")}
+        />
         <div className="orders-page">
-          <button className="btn btn-mobile">Cerca Ordine</button>
+          <button
+            className="btn btn-mobile"
+            onClick={() => navigate("/search-order")}
+          >
+            Cerca Ordine
+          </button>
           <OrdersTable />
         </div>
       </div>

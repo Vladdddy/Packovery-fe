@@ -9,6 +9,7 @@ import LoginRecovery from "./pages/LoginRecovery";
 import CreateAlert from "./pages/CreateAlert";
 import EditAlert from "./pages/EditAlert";
 import OrderDetails from "./pages/OrderDetails";
+import SearchOrder from "./pages/SearchOrder";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/reports" element={<Reports />} />
         <Route path="/recovery" element={<LoginRecovery />} />
         <Route path="/orders/:id" element={<OrderDetails />} />
+        <Route path="/search-order" element={<SearchOrder />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
