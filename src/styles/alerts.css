@@ -324,6 +324,9 @@
 .pv-input,
 .pv-textarea,
 .pv-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--light-grey);
@@ -332,6 +335,11 @@
   background: var(--white);
   font-size: 14px;
   color: var(--black);
+
+  & svg {
+    width: 20px;
+    stroke-width: 1.2px;
+  }
 }
 
 .pv-input.time {

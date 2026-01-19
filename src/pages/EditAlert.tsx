@@ -4,6 +4,7 @@ import Sidebar from "../components/layout/Sidebar";
 import "../styles/alerts.css";
 import Topbar from "../components/layout/Topbar";
 import BackArrow from "../assets/icons/back-arrow";
+import ArrowDropdown from "../assets/icons/dropdown-arrow";
 
 const TYPES = [
   "Ritardo partenza ordine",
@@ -73,6 +74,7 @@ export default function EditAlert() {
               tabIndex={0}
             >
               <div className="pv-select-value">{type || "..."}</div>
+              <ArrowDropdown />
               {typeOpen && (
                 <ul className="pv-select-list">
                   {TYPES.map((t) => (
