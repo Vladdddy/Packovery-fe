@@ -1,24 +1,20 @@
-import "../styles/orders.css";
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
-import OrdersTable from "../components/OrdersTable";
 import { useNavigate } from "react-router-dom";
+import "../styles/orders.css";
 
-function Orders() {
+function OrderDetails() {
   const navigate = useNavigate();
 
   return (
     <section className="layout">
       <Sidebar currentPage="orders" />
       <div className="page-content">
-        <Topbar header="Ricerca Ordine" btn="Cerca Ordine" />
-        <div className="orders-page">
-          <button className="btn btn-mobile">Cerca Ordine</button>
-          <OrdersTable />
-        </div>
+        <Topbar header="ID Ordine: A100D" btn={null} />
+        <div className="alerts-page"></div>
       </div>
     </section>
   );
 }
 
-export default Orders;
+export default OrderDetails;
