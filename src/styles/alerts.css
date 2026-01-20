@@ -335,11 +335,19 @@
     background: var(--white);
     font-size: 14px;
     color: var(--black);
+    transition: 0.3s all ease;
 
     & svg {
         width: 20px;
         stroke-width: 1.2px;
     }
+}
+
+.pv-input:focus,
+.pv-textarea:focus,
+.pv-select:focus {
+    outline: none;
+    border-color: var(--primary);
 }
 
 .pv-input.time {
