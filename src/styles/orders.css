@@ -861,13 +861,16 @@
   font-size: var(--title-s);
   font-weight: 700;
   color: var(--black);
-  margin: 0 0 24px 0;
 }
 
 .order-details-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px 30px;
+  gap: 0 30px;
+}
+
+.order-section:has(.rider-action) .order-details-grid {
+  grid-template-columns: repeat(5, 1fr);
 }
 
 .order-field {
@@ -875,11 +878,28 @@
   flex-direction: column;
 }
 
-.rider-action {
-  margin-top: 30px;
-  padding-top: 20px;
+.order-field .pv-input {
+  color: var(--grey);
+  font-weight: 500;
+  border: 1px solid var(--light-grey);
+  transition: 0.3s all ease;
+}
+
+.order-field .pv-input:focus {
+  outline: none;
+  border: 1px solid var(--primary);
+}
+
+.order-field.rider-action {
   display: flex;
+  flex-direction: column;
   justify-content: flex-end;
+  align-items: stretch;
+}
+
+.order-field.rider-action .contact-rider-btn {
+  margin-top: auto;
+  width: 100%;
 }
 
 .contact-rider-btn {
@@ -893,9 +913,7 @@
 }
 
 .contact-rider-btn:hover {
-  background-color: var(--primary);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--primary-hover);
 }
 
 @media (max-width: 768px) {
