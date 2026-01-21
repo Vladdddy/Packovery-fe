@@ -316,8 +316,8 @@
 .pv-label {
   display: block;
   margin-top: 12px;
-  font-weight: 700;
   margin-bottom: 6px;
+  font-size: var(--paragraph-s);
   color: var(--black);
 }
 
@@ -334,7 +334,7 @@
   box-sizing: border-box;
   background: var(--white);
   font-size: 14px;
-  color: var(--black);
+  color: var(--grey);
 
   & svg {
     width: 20px;
