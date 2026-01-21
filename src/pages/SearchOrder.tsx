@@ -1,4 +1,3 @@
-import React from "react";
 import Sidebar from "../components/layout/Sidebar";
 import { useNavigate } from "react-router-dom";
 import Topbar from "../components/layout/Topbar";
