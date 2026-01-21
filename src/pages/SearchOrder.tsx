@@ -24,12 +24,6 @@ function SearchOrder() {
     "L (3kg - 5kg)",
     "XL (6kg - 10kg)",
   ];
-  const WEIGHT = [
-    "S (1g - 90g)",
-    "M (1kg - 3kg)",
-    "L (3kg - 5kg)",
-    "XL (6kg - 10kg)",
-  ];
 
   const DIMENSION = ["S (1cm - 15cm)", "M (16cm - 30cm)", "L (31cm - 45cm)"];
 
@@ -61,34 +55,6 @@ function SearchOrder() {
                 <input className="pv-input" />
               </div>
 
-              <div className="row">
-                <label className="pv-label">Stato</label>
-                <div
-                  className="pv-select"
-                  onClick={() => setStatoOpen((v) => !v)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <div className="pv-select-value">{stato || "..."}</div>
-                  <ArrowDropdown />
-                  {statoOpen && (
-                    <ul className="pv-select-list">
-                      {STATUS.map((t) => (
-                        <li
-                          key={t}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setStato(t);
-                            setStatoOpen(false);
-                          }}
-                        >
-                          {t}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
               <div className="row">
                 <label className="pv-label">Stato</label>
                 <div
@@ -161,63 +127,7 @@ function SearchOrder() {
                   )}
                 </div>
               </div>
-              <div className="row">
-                <label className="pv-label">Peso</label>
-                <div
-                  className="pv-select"
-                  onClick={() => setPesoOpen((v) => !v)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <div className="pv-select-value">{peso || "..."}</div>
-                  <ArrowDropdown />
-                  {pesoOpen && (
-                    <ul className="pv-select-list">
-                      {WEIGHT.map((t) => (
-                        <li
-                          key={t}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPeso(t);
-                            setPesoOpen(false);
-                          }}
-                        >
-                          {t}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
 
-              <div className="row">
-                <label className="pv-label">Dimensione</label>
-                <div
-                  className="pv-select"
-                  onClick={() => setDimensioneOpen((v) => !v)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <div className="pv-select-value">{dimensione || "..."}</div>
-                  <ArrowDropdown />
-                  {dimensioneOpen && (
-                    <ul className="pv-select-list">
-                      {DIMENSION.map((t) => (
-                        <li
-                          key={t}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDimensione(t);
-                            setDimensioneOpen(false);
-                          }}
-                        >
-                          {t}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
               <div className="row">
                 <label className="pv-label">Dimensione</label>
                 <div
