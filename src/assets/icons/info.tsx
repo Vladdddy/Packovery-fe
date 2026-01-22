@@ -1,37 +1,28 @@
 import React from "react";
 
-const Hide = (props: React.SVGProps<SVGSVGElement>) => (
+const Info = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill={"none"}
         {...props}
     >
-        <path
-            d="M22 8C22 8 18 14 12 14C6 14 2 8 2 8"
+        <circle
+            cx="12"
+            cy="12"
+            r="10"
             stroke="currentColor"
             strokeLinecap="round"
-        ></path>
+            strokeLinejoin="round"
+        ></circle>
         <path
-            d="M15 13.5L16.5 16"
+            d="M12 16V11.5"
             stroke="currentColor"
             strokeLinecap="round"
             strokeLinejoin="round"
         ></path>
         <path
-            d="M20 11L22 13"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        ></path>
-        <path
-            d="M2 13L4 11"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        ></path>
-        <path
-            d="M9 13.5L7.5 16"
+            d="M12 8.01172V8.00172"
             stroke="currentColor"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -39,4 +30,4 @@ const Hide = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-export default Hide;
+export default Info;

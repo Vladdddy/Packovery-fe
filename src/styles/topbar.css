@@ -1,0 +1,114 @@
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.topbar-mobile {
+  display: none;
+}
+
+.topbar-pc {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: var(--bento-bg);
+  border-bottom: 1px solid var(--bento-stroke);
+  flex: 1;
+  min-height: 80px;
+  animation: fadeInDown 0.3s ease-out;
+
+  & h1 {
+    font-size: var(--title-m);
+    color: var(--black);
+  }
+
+  & .left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+
+    & .burger-menu {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 1px solid var(--bento-stroke);
+      background-color: var(--bento-bg);
+
+      & svg {
+        width: 24px;
+        stroke-width: 2px;
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .topbar-pc {
+    display: none;
+  }
+
+  .topbar-mobile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    flex: 1;
+    animation: fadeInDown 0.3s ease-out;
+
+    & h1 {
+      font-size: var(--paragraph-l);
+      color: var(--black);
+    }
+
+    & .left {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+
+      & .burger-menu {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 1px solid var(--bento-stroke);
+        background-color: var(--bento-bg);
+        opacity: 0;
+
+        & svg {
+          width: 24px;
+          stroke-width: 2px;
+        }
+      }
+    }
+  }
+}
+
+.search-order {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: var(--bento-bg);
+  border-bottom: 1px solid var(--bento-stroke);
+  flex: 1;
+  min-height: 80px;
+  position: fixed;
+  width: calc(100% - 250px);
+  z-index: 10;
+}
