@@ -16,8 +16,6 @@ function Reports() {
                         <ReportRender />
                         <ReportRender />
                         <ReportRender />
-                        <ReportRender />
-                        <ReportRender />
                     </div>
                 </div>
             </div>
