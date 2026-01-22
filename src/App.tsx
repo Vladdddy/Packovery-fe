@@ -16,6 +16,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Orders />} />
+        <Route path="/orders" element={<Orders />} />
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/alerts/create" element={<CreateAlert />} />
         <Route path="/alerts/:id/edit" element={<EditAlert />} />
