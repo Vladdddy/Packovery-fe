@@ -110,8 +110,20 @@ export const authService = {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to request password reset');
+      let errorMessage = 'Failed to request password reset';
+      try {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const error = await response.json();
+          errorMessage = error.message || error.error || JSON.stringify(error);
+        } else {
+          const text = await response.text();
+          errorMessage = text || `Server error: ${response.status}`;
+        }
+      } catch (e) {
+        errorMessage = `Server error: ${response.status}`;
+      }
+      throw new Error(errorMessage);
     }
   },
 
@@ -125,8 +137,20 @@ export const authService = {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to reset password');
+      let errorMessage = 'Failed to reset password';
+      try {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const error = await response.json();
+          errorMessage = error.message || error.error || JSON.stringify(error);
+        } else {
+          const text = await response.text();
+          errorMessage = text || `Server error: ${response.status}`;
+        }
+      } catch (e) {
+        errorMessage = `Server error: ${response.status}`;
+      }
+      throw new Error(errorMessage);
     }
   },
 
