@@ -1,238 +1,253 @@
 .login-wrapper {
-    overflow: hidden;
-    min-height: 100vh;
+  overflow: hidden;
+  min-height: 100vh;
 }
 
 .img-cont {
-    display: flex;
-    justify-content: center;
-    margin-top: 16vh;
-    & img {
-        height: 60px;
-    }
+  display: flex;
+  justify-content: center;
+  margin-top: 16vh;
+  & img {
+    height: 60px;
+  }
 }
 
 .login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  & form {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    & form {
-        display: flex;
-        flex-direction: column;
-        align-items: start;
-        margin-top: 8vh;
-        & h1 {
-            text-align: center;
-            width: 100%;
-            font-size: var(--title-l);
-            color: var(--black);
-        }
-        & h2 {
-            text-align: center;
-            width: 100%;
-            font-weight: normal;
-            font-size: var(--paragraph-m);
-            color: var(--grey);
-            margin-top: 1vh;
-            max-width: 30vw;
-        }
-        & .row {
-            display: flex;
-            flex-direction: column;
-            margin-top: 4vh;
-            & label {
-                font-size: var(--paragraph-m);
-                margin-bottom: 1vh;
-                color: var(--grey);
-            }
-            & input {
-                width: 300px;
-                height: 40px;
-                border: 1px solid var(--light-grey);
-                border-radius: 8px;
-                padding-left: 8px;
-                font-size: var(--paragraph-m);
-                transition: all 0.3s ease;
-
-                &:focus {
-                    outline: none;
-                    border: 1px solid var(--primary);
-                }
-            }
-
-            &.password-field {
-                .password-input-wrapper {
-                    position: relative;
-                    display: flex;
-                    align-items: center;
-
-                    & input {
-                        padding-right: 40px;
-                    }
-
-                    .password-toggle-btn {
-                        position: absolute;
-                        right: 8px;
-                        background: none;
-                        border: none;
-                        cursor: pointer;
-                        padding: 4px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: var(--grey);
-                        transition: color 0.2s ease;
-                        width: auto;
-                        height: auto;
-                        margin: 0;
-
-                        &:hover {
-                            color: var(--primary);
-                            background: none;
-                        }
-
-                        & svg {
-                            display: block;
-                            stroke-width: 1.2px;
-                        }
-                    }
-                }
-            }
-        }
-        & p {
-            margin-top: 2vh;
-            text-align: start;
-            font-size: var(--paragraph-s);
-            color: var(--grey);
-            transition: all 0.3s ease;
-            text-decoration: underline;
-
-            &:hover {
-                color: var(--primary);
-                cursor: pointer;
-            }
-        }
-        & button {
-            width: 300px;
-            height: 40px;
-            background-color: var(--primary);
-            color: var(--white);
-            border: none;
-            border-radius: 10px;
-            font-size: var(--paragraph-m);
-            margin-top: 6vh;
-            cursor: pointer;
-            transition: all 0.3s ease;
-
-            &:hover {
-                background-color: var(--primary-hover);
-            }
-        }
+    align-items: start;
+    margin-top: 8vh;
+    & h1 {
+      text-align: center;
+      width: 100%;
+      font-size: var(--title-l);
+      color: var(--black);
     }
+    & h2 {
+      text-align: center;
+      width: 100%;
+      font-weight: normal;
+      font-size: var(--paragraph-m);
+      color: var(--grey);
+      margin-top: 1vh;
+      max-width: 30vw;
+    }
+    & .row {
+      display: flex;
+      flex-direction: column;
+      margin-top: 4vh;
+      & label {
+        font-size: var(--paragraph-m);
+        margin-bottom: 1vh;
+        color: var(--grey);
+      }
+      & input {
+        width: 300px;
+        height: 40px;
+        border: 1px solid var(--light-grey);
+        border-radius: 8px;
+        padding-left: 8px;
+        font-size: var(--paragraph-m);
+        transition: all 0.3s ease;
+
+        &:focus {
+          outline: none;
+          border: 1px solid var(--primary);
+        }
+      }
+
+      &.password-field {
+        .password-input-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+
+          & input {
+            padding-right: 40px;
+          }
+
+          .password-toggle-btn {
+            position: absolute;
+            right: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--grey);
+            transition: color 0.2s ease;
+            width: auto;
+            height: auto;
+            margin: 0;
+
+            &:hover {
+              color: var(--primary);
+              background: none;
+            }
+
+            & svg {
+              display: block;
+            }
+          }
+        }
+      }
+    }
+    & p {
+      margin-top: 2vh;
+      text-align: start;
+      font-size: var(--paragraph-s);
+      color: var(--grey);
+      transition: all 0.3s ease;
+      text-decoration: underline;
+
+      &:hover {
+        color: var(--primary);
+        cursor: pointer;
+      }
+    }
+    & .error-message {
+      width: 300px;
+      padding: 10px 12px;
+      background-color: #fee;
+      border: 1px solid #fcc;
+      border-radius: 8px;
+      color: #c00;
+      font-size: var(--paragraph-s);
+      margin-top: 2vh;
+      text-align: center;
+    }
+    & button {
+      width: 300px;
+      height: 40px;
+      background-color: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-size: var(--paragraph-m);
+      margin-top: 6vh;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: var(--primary-hover);
+      }
+
+      &:disabled {
+        background-color: var(--grey);
+        cursor: not-allowed;
+      }
+    }
+  }
 }
 
 .insert-email {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  & form {
     align-items: center;
 
-    & form {
-        align-items: center;
+    .buttons {
+      display: flex;
+      gap: 10px;
 
-        .buttons {
-            display: flex;
-            gap: 10px;
-
-            & button {
-                width: 140px;
-                height: 40px;
-                border: none;
-                border-radius: 10px;
-                font-size: var(--paragraph-m);
-                margin-top: 6vh;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
-        }
-
-        .secondary-btn {
-            background-color: var(--light);
-            color: var(--black);
-
-            &:hover {
-                background-color: var(--light-grey);
-            }
-        }
+      & button {
+        width: 140px;
+        height: 40px;
+        border: none;
+        border-radius: 10px;
+        font-size: var(--paragraph-m);
+        margin-top: 6vh;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
     }
+
+    .secondary-btn {
+      background-color: var(--light);
+      color: var(--black);
+
+      &:hover {
+        background-color: var(--light-grey);
+      }
+    }
+  }
 }
 
 .confirm-code {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  & form {
     align-items: center;
 
-    & form {
-        align-items: center;
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-top: 4vh;
 
-        .row {
-            display: flex;
-            gap: 10px;
-            margin-top: 4vh;
+      .numbers {
+        display: flex;
+        gap: 10px;
+      }
 
-            .numbers {
-                display: flex;
-                gap: 10px;
-            }
+      & input {
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        font-size: var(--paragraph-l);
+        border: 1px solid var(--light-grey);
+        border-radius: 8px;
+        padding: 0;
 
-            & input {
-                width: 50px;
-                height: 50px;
-                text-align: center;
-                font-size: var(--paragraph-l);
-                border: 1px solid var(--light-grey);
-                border-radius: 8px;
-                padding: 0;
-
-                &:focus {
-                    outline: none;
-                    border: 1px solid var(--primary);
-                }
-
-                &::-webkit-outer-spin-button,
-                &::-webkit-inner-spin-button {
-                    -webkit-appearance: none;
-                    margin: 0;
-                }
-
-                &[type="number"] {
-                    -moz-appearance: textfield;
-                }
-            }
+        &:focus {
+          outline: none;
+          border: 1px solid var(--primary);
         }
 
-        .buttons {
-            display: flex;
-            gap: 10px;
-
-            & button {
-                width: 140px;
-                height: 40px;
-                border: none;
-                border-radius: 10px;
-                font-size: var(--paragraph-m);
-                margin-top: 6vh;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
         }
 
-        .secondary-btn {
-            background-color: var(--light);
-            color: var(--black);
-
-            &:hover {
-                background-color: var(--light-grey);
-            }
+        &[type="number"] {
+          -moz-appearance: textfield;
         }
+      }
     }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+
+      & button {
+        width: 140px;
+        height: 40px;
+        border: none;
+        border-radius: 10px;
+        font-size: var(--paragraph-m);
+        margin-top: 6vh;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+    }
+
+    .secondary-btn {
+      background-color: var(--light);
+      color: var(--black);
+
+      &:hover {
+        background-color: var(--light-grey);
+      }
+    }
+  }
 }
