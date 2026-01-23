@@ -1,0 +1,129 @@
+.reports-page-content {
+    margin: 40px;
+    height: calc(100vh - 24vh);
+    overflow: auto;
+}
+
+.list {
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.report {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bento-bg);
+    border: 1px solid var(--bento-stroke);
+    padding: 20px;
+    border-radius: 10px;
+    opacity: 0;
+    animation: fadeInUp 0.3s ease-out forwards;
+
+    & .start-cont {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        & .warning-icon {
+            color: var(--red);
+            width: 32px;
+            stroke-width: 2px;
+        }
+
+        & .id-display {
+            display: flex;
+            flex-direction: column;
+
+            & h1 {
+                font-size: var(--paragraph-m);
+                font-weight: bold;
+                color: var(--black);
+            }
+
+            & h2 {
+                font-size: var(--paragraph-s);
+                font-weight: normal;
+                color: var(--grey);
+            }
+        }
+    }
+
+    & span {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 8px;
+        font-size: var(--paragraph-s);
+        font-weight: 500;
+        background-color: var(--red-10);
+        color: var(--red);
+    }
+
+    & .time {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        & .clock-icon {
+            color: var(--black);
+            width: 20px;
+            stroke-width: 1.2px;
+        }
+
+        & p {
+            font-size: var(--paragraph-s);
+            color: var(--black);
+        }
+    }
+}
+
+/* Staggered animation delays for each report */
+.report:nth-child(1) {
+    animation-delay: 0.1s;
+}
+.report:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.report:nth-child(3) {
+    animation-delay: 0.3s;
+}
+.report:nth-child(4) {
+    animation-delay: 0.4s;
+}
+.report:nth-child(5) {
+    animation-delay: 0.5s;
+}
+.report:nth-child(n + 6) {
+    animation-delay: 0.6s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .reports-page-content {
+        margin: 20px;
+        height: auto;
+    }
+
+    .report {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+
+        & .start-cont {
+            flex-direction: row;
+        }
+    }
+}

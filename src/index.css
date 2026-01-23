@@ -44,6 +44,15 @@ body {
 
 .page-content {
   flex: 1;
+  margin-left: 250px;
+  padding-top: 80px;
+}
+
+@media (max-width: 1024px) {
+  .page-content {
+    margin-left: 0;
+    padding-top: 0;
+  }
 }
 
 .btn {
