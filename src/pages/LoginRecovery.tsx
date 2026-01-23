@@ -23,9 +23,9 @@ function LoginRecovery() {
       {step === 0 ? (
         <InsertEmail onSubmit={handleEmailSubmit} />
       ) : step === 1 ? (
-        <ConfirmCode onSubmit={handleCodeSubmit} />
+        <ConfirmCode onSubmit={handleCodeSubmit} onBack={() => setStep(0)} />
       ) : (
-        <NewPassword email={email} code={code} />
+        <NewPassword email={email} code={code} onBack={() => setStep(1)} />
       )}
     </section>
   );
