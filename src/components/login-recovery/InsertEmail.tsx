@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Logo from "../../../public/packovery-full-logo.png";
 import "../../styles/login.css";
 import { authService } from "../../services/authService";
@@ -8,6 +9,7 @@ interface InsertEmailProps {
 }
 
 function InsertEmail({ onSubmit }: InsertEmailProps) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -58,7 +60,11 @@ function InsertEmail({ onSubmit }: InsertEmailProps) {
             />
           </div>
           <div className="buttons animate-slide-right-delay-4">
-            <button type="button" className="secondary-btn">
+            <button
+              type="button"
+              className="secondary-btn"
+              onClick={() => navigate("/login")}
+            >
               Annulla
             </button>
             <button type="submit" disabled={loading}>
