@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Logo from "../../../public/packovery-full-logo.png";
 import "../../styles/login.css";
 import {
@@ -8,9 +9,11 @@ import {
 
 interface ConfirmCodeProps {
   onSubmit: (code: string) => void;
+  onBack?: () => void;
 }
 
-function ConfirmCode({ onSubmit }: ConfirmCodeProps) {
+function ConfirmCode({ onSubmit, onBack }: ConfirmCodeProps) {
+  const navigate = useNavigate();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [error, setError] = useState("");
 
@@ -60,7 +63,11 @@ function ConfirmCode({ onSubmit }: ConfirmCodeProps) {
             </div>
           </div>
           <div className="buttons animate-slide-right-delay-4">
-            <button type="button" className="secondary-btn">
+            <button
+              type="button"
+              className="secondary-btn"
+              onClick={() => navigate("/insert-email")}
+            >
               Annulla
             </button>
             <button type="submit">Conferma</button>

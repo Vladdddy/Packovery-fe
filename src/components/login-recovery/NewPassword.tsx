@@ -7,9 +7,10 @@ import { authService } from "../../services/authService";
 interface NewPasswordProps {
   email: string;
   code: string;
+  onBack?: () => void;
 }
 
-function NewPassword({ email, code }: NewPasswordProps) {
+function NewPassword({ email, code, onBack }: NewPasswordProps) {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -83,7 +84,11 @@ function NewPassword({ email, code }: NewPasswordProps) {
             />
           </div>
           <div className="buttons animate-slide-right-delay-5">
-            <button type="button" className="secondary-btn">
+            <button
+              type="button"
+              className="secondary-btn"
+              onClick={() => navigate("/login")}
+            >
               Annulla
             </button>
             <button type="submit" disabled={loading}>
