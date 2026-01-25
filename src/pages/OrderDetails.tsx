@@ -1,6 +1,6 @@
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import "../styles/orders.css";
 import "../styles/alerts.css";
@@ -9,6 +9,7 @@ import Map from "../components/Map";
 
 function OrderDetails() {
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const [orderData, setOrderData] = useState({
     creatorName: "",
@@ -90,7 +91,7 @@ function OrderDetails() {
     <section className="layout">
       <Sidebar currentPage="orders" />
       <div className="page-content">
-        <Topbar header="ID Ordine: A100D" btn={null} />
+        <Topbar header={`ID Ordine: ${id || "N/A"}`} btn={null} />
         <main className="pv-main">
           <div className="pv-main-header">
             <button
