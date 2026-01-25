@@ -29,7 +29,7 @@ interface BlockedResponse {
 }
 
 export interface UserBlockedError {
-  type: 'USER_BLOCKED';
+  type: "USER_BLOCKED";
   data: BlockedResponse;
 }
 
@@ -112,7 +112,7 @@ export const authService = {
     // Check for blocked user in response
     if (result.permanent !== undefined) {
       throw {
-        type: 'USER_BLOCKED',
+        type: "USER_BLOCKED",
         data: result as BlockedResponse,
       };
     }
@@ -288,13 +288,17 @@ export const authService = {
 
 export const userService = {
   getAll: () =>
-    authService.fetchWithAuth(`${API_BASE_URL}/api/users`).then(r => r.json()),
+    authService
+      .fetchWithAuth(`${API_BASE_URL}/api/users`)
+      .then((r) => r.json()),
 
   getById: (id: number) =>
-    authService.fetchWithAuth(`${API_BASE_URL}/api/users/${id}`).then(r => r.json()),
+    authService
+      .fetchWithAuth(`${API_BASE_URL}/api/users/${id}`)
+      .then((r) => r.json()),
 
   delete: (id: number) =>
     authService.fetchWithAuth(`${API_BASE_URL}/api/users/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     }),
 };
