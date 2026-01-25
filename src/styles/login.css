@@ -122,6 +122,36 @@
       margin-top: 2vh;
       text-align: center;
     }
+    & .blocked-user-message {
+      width: 300px;
+      padding: 20px;
+      text-align: center;
+
+      & .blocked-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+
+      & p {
+        color: #f70000;
+        font-size: var(--paragraph-s);
+        margin: 8px 0;
+        text-decoration: none;
+        cursor: default;
+
+        &.time-remaining {
+          font-weight: 600;
+          color: #f70000;
+          margin-top: 12px;
+          padding: 8px;
+          border-radius: 6px;
+        }
+
+        &.contact-support {
+          color: #f70000;
+        }
+      }
+    }
     & button {
       width: 300px;
       height: 40px;
