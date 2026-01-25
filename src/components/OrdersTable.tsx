@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "../styles/orders.css";
 import InfoIcon from "../assets/icons/info.tsx";
+import { ordersService } from "../services/ordersService.ts";
 
 interface Order {
     id: string;
@@ -16,6 +17,17 @@ function OrdersTable() {
     const [currentPage, setCurrentPage] = useState(1);
     const [hasAnimated, setHasAnimated] = useState(false);
     const totalPages = 10;
+
+    const getOrders = async () => {
+        try {
+            const data = await ordersService.fetchOrders();
+            if (data) {
+                console.log("Fetched orders:", data);
+            }
+        } catch (error) {
+            console.error("Error fetching orders:", error);
+        }
+    };
 
     // Sample data matching the image
     const orders: Order[] = [
@@ -114,6 +126,7 @@ function OrdersTable() {
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setHasAnimated(true);
+        getOrders();
     }, []);
 
     const handlePageChange = (page: number) => {
