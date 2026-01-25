@@ -10,25 +10,76 @@ interface LoginRequest {
 interface LoginResponse {
   accessToken: string;
   refreshToken: string;
-  user?: {
-    email: string;
-    firstName: string;
-    lastName: string;
-  };
-}
-
-interface RefreshTokenRequest {
-  refreshToken: string;
-}
-
-interface ForgotPasswordRequest {
+  message: string;
   email: string;
 }
+
 
 interface ResetPasswordRequest {
   code: string;
   newPassword: string;
   email: string;
+}
+
+// Track if a refresh is in progress to avoid multiple simultaneous refresh attempts
+let isRefreshing = false;
+let refreshPromise: Promise<LoginResponse> | null = null;
+
+// Helper function to decode JWT and check expiration
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const expirationTime = payload.exp * 1000; // Convert to milliseconds
+    const currentTime = Date.now();
+    // Consider token expired if it expires within the next 60 seconds
+    return currentTime >= expirationTime - 60000;
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    return true;
+  }
+}
+
+// Helper function to make authenticated requests with auto-retry on 401
+async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
+  const accessToken = localStorage.getItem('accessToken');
+  
+  // Add authorization header
+  const headers = {
+    ...options.headers,
+    'Authorization': `Bearer ${accessToken}`,
+  };
+
+  // Make the request
+  let response = await fetch(url, { ...options, headers });
+
+  // If we get a 401, try to refresh the token and retry
+  if (response.status === 401) {
+    const refreshToken = localStorage.getItem('refreshToken');
+    
+    if (!refreshToken) {
+      // No refresh token available, logout
+      authService.logout();
+      window.location.href = '/login';
+      throw new Error('Authentication required');
+    }
+
+    try {
+      // Refresh the token
+      await authService.refreshToken(refreshToken);
+      
+      // Retry the original request with the new token
+      const newAccessToken = localStorage.getItem('accessToken');
+      headers['Authorization'] = `Bearer ${newAccessToken}`;
+      response = await fetch(url, { ...options, headers });
+    } catch (error) {
+      // Refresh failed, logout
+      authService.logout();
+      window.location.href = '/login';
+      throw new Error('Session expired. Please login again.');
+    }
+  }
+
+  return response;
 }
 
 export const authService = {
@@ -75,29 +126,44 @@ export const authService = {
   },
 
   async refreshToken(refreshToken: string): Promise<LoginResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refreshToken }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Token refresh failed');
+    // Prevent multiple simultaneous refresh attempts
+    if (isRefreshing && refreshPromise) {
+      return refreshPromise;
     }
 
-    const result = await response.json();
-    
-    // Update tokens in localStorage
-    if (result.accessToken) {
-      localStorage.setItem('accessToken', result.accessToken);
-    }
-    if (result.refreshToken) {
-      localStorage.setItem('refreshToken', result.refreshToken);
-    }
+    isRefreshing = true;
+    refreshPromise = (async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ refreshToken }),
+        });
 
-    return result;
+        if (!response.ok) {
+          throw new Error('Token refresh failed');
+        }
+
+        const result = await response.json();
+        
+        // Update tokens in localStorage
+        if (result.accessToken) {
+          localStorage.setItem('accessToken', result.accessToken);
+        }
+        if (result.refreshToken) {
+          localStorage.setItem('refreshToken', result.refreshToken);
+        }
+
+        return result;
+      } finally {
+        isRefreshing = false;
+        refreshPromise = null;
+      }
+    })();
+
+    return refreshPromise;
   },
 
   async requestPasswordReset(email: string): Promise<void> {
@@ -168,6 +234,35 @@ export const authService = {
   },
 
   isAuthenticated(): boolean {
-    return !!this.getAccessToken();
+    const token = this.getAccessToken();
+    if (!token) return false;
+    
+    // Check if token is expired
+    if (isTokenExpired(token)) {
+      // Try to refresh if we have a refresh token
+      const refreshToken = this.getRefreshToken();
+      if (refreshToken) {
+        // Trigger refresh in background
+        this.refreshToken(refreshToken).catch(() => {
+          this.logout();
+        });
+      } else {
+        this.logout();
+        return false;
+      }
+    }
+    
+    return true;
   },
+
+  // New method to check token expiration without triggering refresh
+  isTokenExpired(): boolean {
+    const token = this.getAccessToken();
+    if (!token) return true;
+    return isTokenExpired(token);
+  },
+
+  // Export the fetchWithAuth helper for use in other services
+  fetchWithAuth,
 };
+
