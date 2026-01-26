@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Topbar from "../components/layout/Topbar";
 import BackArrow from "../assets/icons/back-arrow";
 import ArrowDropdown from "../assets/icons/dropdown-arrow";
+import { ordersService } from "../services/ordersService";
 import "../styles/orders.css";
 
 function SearchOrder() {
@@ -14,22 +15,57 @@ function SearchOrder() {
     const [peso, setPeso] = useState("");
     const [dimensioneOpen, setDimensioneOpen] = useState(false);
     const [dimensione, setDimensione] = useState("");
+    const [orderId, setOrderId] = useState("");
+    const [pickUpCity, setPickUpCity] = useState("");
+    const [deliveryCity, setDeliveryCity] = useState("");
+    const [creationDate, setCreationDate] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const STATUS = [
-        "In elaborazione",
         "In attesa",
+        "Assegnato",
         "In transito",
+        "Fallito",
+        "Annullato",
+        "Restituito",
         "Consegnato",
     ];
 
-    const WEIGHT = [
-        "S (1g - 90g)",
-        "M (1kg - 3kg)",
-        "L (3kg - 5kg)",
-        "XL (6kg - 10kg)",
-    ];
+    const WEIGHT = ["S", "M", "L", "XL"];
 
-    const DIMENSION = ["S (1cm - 15cm)", "M (16cm - 30cm)", "L (31cm - 45cm)"];
+    const DIMENSION = ["S", "M", "L"];
+
+    const handleSearch = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+
+        try {
+            if (!orderId) {
+                setError("Inserisci un ID ordine per la ricerca");
+                setLoading(false);
+                return;
+            }
+
+            const results = await ordersService.getOrderById(orderId);
+            console.log("Search results:", results);
+
+            if (results.length === 0) {
+                setError("Nessun ordine trovato con questo ID");
+                setLoading(false);
+                return;
+            }
+
+            // Navigate back to orders page with the found orders
+            navigate("/orders", { state: { searchedOrders: results } });
+        } catch (err) {
+            console.error("Error searching order:", err);
+            setError("Ordine non trovato o errore durante la ricerca");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <section className="layout search-order-page">
@@ -52,11 +88,15 @@ function SearchOrder() {
                         </button>
                     </div>
 
-                    <form action="" className="search-form">
+                    <form onSubmit={handleSearch} className="search-form">
                         <div className="inputs-form">
                             <div className="row">
                                 <label className="pv-label">ID Ordine</label>
-                                <input className="pv-input" />
+                                <input
+                                    className="pv-input"
+                                    value={orderId}
+                                    onChange={(e) => setOrderId(e.target.value)}
+                                />
                             </div>
 
                             <div className="row">
@@ -94,21 +134,40 @@ function SearchOrder() {
                                 <label className="pv-label">
                                     Città di partenza
                                 </label>
-                                <input className="pv-input" />
+                                <input
+                                    className="pv-input"
+                                    value={pickUpCity}
+                                    onChange={(e) =>
+                                        setPickUpCity(e.target.value)
+                                    }
+                                />
                             </div>
 
                             <div className="row">
                                 <label className="pv-label">
                                     Città di destinazione
                                 </label>
-                                <input className="pv-input" />
+                                <input
+                                    className="pv-input"
+                                    value={deliveryCity}
+                                    onChange={(e) =>
+                                        setDeliveryCity(e.target.value)
+                                    }
+                                />
                             </div>
 
                             <div className="row">
                                 <label className="pv-label">
                                     Data creazione ordine
                                 </label>
-                                <input className="pv-input" type="date" />
+                                <input
+                                    className="pv-input"
+                                    type="date"
+                                    value={creationDate}
+                                    onChange={(e) =>
+                                        setCreationDate(e.target.value)
+                                    }
+                                />
                             </div>
 
                             <div className="row">
@@ -179,9 +238,23 @@ function SearchOrder() {
                                 <label className="pv-label hidden-label">
                                     Dimensione
                                 </label>
-                                <button className="btn-form">Cerca</button>
+                                <button
+                                    className="btn-form"
+                                    type="submit"
+                                    disabled={loading}
+                                >
+                                    {loading ? "Ricerca..." : "Cerca"}
+                                </button>
                             </div>
                         </div>
+                        {error && (
+                            <div
+                                className="error-message"
+                                style={{ color: "red", marginBottom: "1rem" }}
+                            >
+                                {error}
+                            </div>
+                        )}
                     </form>
                 </main>
             </div>

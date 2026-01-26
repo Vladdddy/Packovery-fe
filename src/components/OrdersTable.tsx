@@ -4,130 +4,73 @@ import InfoIcon from "../assets/icons/info.tsx";
 import { ordersService } from "../services/ordersService.ts";
 
 interface Order {
-    id: string;
-    stato: string;
-    partenza: string;
-    destinazione: string;
-    data: string;
-    peso: string;
-    dimensione: string;
+    id: number;
+    trackingCode: string;
+    creationDate: string;
+    deliveryCity: string | null;
+    deliveryProvince: string | null;
+    pickUpCity: string | null;
+    pickUpProvince: string | null;
+    size: string;
+    status: string;
+    weight: string;
 }
 
-function OrdersTable() {
+interface OrdersTableProps {
+    searchedOrders?: Order[];
+}
+
+function OrdersTable({ searchedOrders }: OrdersTableProps) {
     const [currentPage, setCurrentPage] = useState(1);
     const [hasAnimated, setHasAnimated] = useState(false);
-    const totalPages = 10;
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [loading, setLoading] = useState(true);
+    const ITEMS_PER_PAGE = 10;
+
+    // Calculate total pages based on actual number of orders
+    const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
+
+    // Get orders for current page
+    const getCurrentPageOrders = () => {
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+        return orders.slice(startIndex, endIndex);
+    };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
 
     const getOrders = async () => {
         try {
+            setLoading(true);
             const data = await ordersService.fetchOrders();
             if (data) {
-                console.log("Fetched orders:", data);
+                setOrders(data);
             }
         } catch (error) {
             console.error("Error fetching orders:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    // Sample data matching the image
-    const orders: Order[] = [
-        {
-            id: "AB1234",
-            stato: "In transito",
-            partenza: "Legnano MI",
-            destinazione: "Varese VA",
-            data: "12/01/2026",
-            peso: "M (1kg - 3kg)",
-            dimensione: "M (16cm - 30cm)",
-        },
-        {
-            id: "CD5678",
-            stato: "In transito",
-            partenza: "Busto Arsizio VA",
-            destinazione: "Cislago VA",
-            data: "13/01/2026",
-            peso: "L (3kg - 5kg)",
-            dimensione: "L (31cm - 45cm)",
-        },
-        {
-            id: "EF9012",
-            stato: "In attesa",
-            partenza: "Varese VA",
-            destinazione: "Tradate VA",
-            data: "21/12/2025",
-            peso: "S (1g - 90g)",
-            dimensione: "S (1cm - 15cm)",
-        },
-        {
-            id: "GH3456",
-            stato: "In transito",
-            partenza: "Saronno VA",
-            destinazione: "Como CO",
-            data: "13/01/2026",
-            peso: "XL (6kg - 10kg)",
-            dimensione: "M (16cm - 30cm)",
-        },
-        {
-            id: "GH3456",
-            stato: "In transito",
-            partenza: "Saronno VA",
-            destinazione: "Como CO",
-            data: "13/01/2026",
-            peso: "XL (6kg - 10kg)",
-            dimensione: "M (16cm - 30cm)",
-        },
-        {
-            id: "GH3456",
-            stato: "In transito",
-            partenza: "Saronno VA",
-            destinazione: "Como CO",
-            data: "13/01/2026",
-            peso: "XL (6kg - 10kg)",
-            dimensione: "M (16cm - 30cm)",
-        },
-        {
-            id: "GH3456",
-            stato: "In transito",
-            partenza: "Saronno VA",
-            destinazione: "Como CO",
-            data: "13/01/2026",
-            peso: "XL (6kg - 10kg)",
-            dimensione: "M (16cm - 30cm)",
-        },
-        {
-            id: "GH3456",
-            stato: "In transito",
-            partenza: "Saronno VA",
-            destinazione: "Como CO",
-            data: "13/01/2026",
-            peso: "XL (6kg - 10kg)",
-            dimensione: "M (16cm - 30cm)",
-        },
-        {
-            id: "GH3456",
-            stato: "In transito",
-            partenza: "Saronno VA",
-            destinazione: "Como CO",
-            data: "13/01/2026",
-            peso: "XL (6kg - 10kg)",
-            dimensione: "M (16cm - 30cm)",
-        },
-        {
-            id: "GH3456",
-            stato: "In transito",
-            partenza: "Saronno VA",
-            destinazione: "Como CO",
-            data: "13/01/2026",
-            peso: "XL (6kg - 10kg)",
-            dimensione: "M (16cm - 30cm)",
-        },
-    ];
-
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setHasAnimated(true);
-        getOrders();
-    }, []);
+        if (searchedOrders) {
+            // Display the searched orders
+            setOrders(searchedOrders);
+            setLoading(false);
+            setCurrentPage(1); // Reset to first page when searching
+        } else {
+            // Fetch all orders
+            getOrders();
+        }
+    }, [searchedOrders]);
 
     const handlePageChange = (page: number) => {
         if (page >= 1 && page <= totalPages) {
@@ -138,6 +81,15 @@ function OrdersTable() {
     // Generate dynamic page numbers based on current page
     const getPageNumbers = () => {
         const pages: (number | string)[] = [];
+
+        // If no pages, return empty array
+        if (totalPages === 0) return [];
+
+        // If only one page, just show it
+        if (totalPages === 1) {
+            pages.push(1);
+            return pages;
+        }
 
         if (currentPage <= 3) {
             // Show first 3 pages
@@ -152,11 +104,17 @@ function OrdersTable() {
             }
         } else if (currentPage >= totalPages - 2) {
             // Show last 3 pages
+            pages.push(1);
+            if (totalPages > 4) {
+                pages.push("...");
+            }
             for (let i = Math.max(totalPages - 2, 1); i <= totalPages; i++) {
                 pages.push(i);
             }
         } else {
             // Show current page and neighbors (sliding window)
+            pages.push(1);
+            pages.push("...");
             pages.push(currentPage - 1);
             pages.push(currentPage);
             pages.push(currentPage + 1);
@@ -167,6 +125,27 @@ function OrdersTable() {
         return pages;
     };
 
+    const setStatusText = (status: string) => {
+        switch (status) {
+            case "PENDING":
+                return "In attesa";
+            case "ASSIGNED":
+                return "Assegnato";
+            case "CANCELLED":
+                return "Annullato";
+            case "FAILED":
+                return "Fallito";
+            case "IN_TRANSIT":
+                return "In transito";
+            case "DELIVERED":
+                return "Consegnato";
+            case "RETURNED":
+                return "Restituito";
+            default:
+                return status;
+        }
+    };
+
     return (
         <div
             className={`orders-table-container ${hasAnimated ? "animate-in" : ""}`}
@@ -175,82 +154,125 @@ function OrdersTable() {
                 <table className="orders-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>Tracking Code</th>
                             <th>Stato</th>
                             <th>Partenza</th>
                             <th>Destinazione</th>
                             <th>Data</th>
                             <th>Peso</th>
                             <th>Dimensione</th>
-                            <th></th>
+                            <th>Dettagli</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map((order, index) => (
-                            <tr
-                                key={order.id}
-                                className={hasAnimated ? "animate-row" : ""}
-                                style={
-                                    hasAnimated
-                                        ? { animationDelay: `${index * 0.1}s` }
-                                        : {}
-                                }
-                            >
-                                <td>{order.id}</td>
-                                <td>
-                                    <span
-                                        className={`status ${order.stato.toLowerCase().replace(" ", "-")}`}
-                                    >
-                                        {order.stato}
-                                    </span>
-                                </td>
-                                <td>{order.partenza}</td>
-                                <td>{order.destinazione}</td>
-                                <td>{order.data}</td>
-                                <td>{order.peso}</td>
-                                <td>{order.dimensione}</td>
-                                <td>
-                                    <button className="detail-button">
-                                        <InfoIcon />
-                                    </button>
+                        {loading ? (
+                            <tr>
+                                <td
+                                    colSpan={8}
+                                    style={{
+                                        textAlign: "center",
+                                        padding: "2rem",
+                                    }}
+                                >
+                                    Loading orders...
                                 </td>
                             </tr>
-                        ))}
+                        ) : orders.length === 0 ? (
+                            <tr>
+                                <td
+                                    colSpan={8}
+                                    style={{
+                                        textAlign: "center",
+                                        padding: "2rem",
+                                    }}
+                                >
+                                    No orders found
+                                </td>
+                            </tr>
+                        ) : (
+                            getCurrentPageOrders().map((order, index) => (
+                                <tr
+                                    key={`${order.id}-${index}`}
+                                    className={hasAnimated ? "animate-row" : ""}
+                                    style={
+                                        hasAnimated
+                                            ? {
+                                                  animationDelay: `${index * 0.1}s`,
+                                              }
+                                            : {}
+                                    }
+                                >
+                                    <td>{order.trackingCode || order.id}</td>
+                                    <td>
+                                        <span
+                                            className={`status ${order.status?.toLowerCase().replace("_", "-") || ""}`}
+                                        >
+                                            {setStatusText(order.status)}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {order.pickUpCity &&
+                                        order.pickUpProvince
+                                            ? `${order.pickUpCity} ${order.pickUpProvince}`
+                                            : "N/A"}
+                                    </td>
+                                    <td>
+                                        {order.deliveryCity &&
+                                        order.deliveryProvince
+                                            ? `${order.deliveryCity} ${order.deliveryProvince}`
+                                            : "N/A"}
+                                    </td>
+                                    <td>{formatDate(order.creationDate)}</td>
+                                    <td>{order.weight || "N/A"}</td>
+                                    <td>{order.size || "N/A"}</td>
+                                    <td>
+                                        <button className="detail-button">
+                                            <InfoIcon />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>
 
-            <div className="pagination">
-                <button
-                    className="pagination-button"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                >
-                    ‹
-                </button>
-                {getPageNumbers().map((page, index) =>
-                    typeof page === "number" ? (
-                        <button
-                            key={page}
-                            className={`pagination-button ${currentPage === page ? "active" : ""}`}
-                            onClick={() => handlePageChange(page)}
-                        >
-                            {page}
-                        </button>
-                    ) : (
-                        <span key={`dots-${index}`} className="pagination-dots">
-                            {page}
-                        </span>
-                    ),
-                )}
-                <button
-                    className="pagination-button"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                >
-                    ›
-                </button>
-            </div>
+            {totalPages > 1 && (
+                <div className="pagination">
+                    <button
+                        className="pagination-button"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                    >
+                        ‹
+                    </button>
+                    {getPageNumbers().map((page, index) =>
+                        typeof page === "number" ? (
+                            <button
+                                key={page}
+                                className={`pagination-button ${currentPage === page ? "active" : ""}`}
+                                onClick={() => handlePageChange(page)}
+                            >
+                                {page}
+                            </button>
+                        ) : (
+                            <span
+                                key={`dots-${index}`}
+                                className="pagination-dots"
+                            >
+                                {page}
+                            </span>
+                        ),
+                    )}
+                    <button
+                        className="pagination-button"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                    >
+                        ›
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
