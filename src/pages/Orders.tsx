@@ -3,11 +3,26 @@ import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
 import OrdersTable from "../components/OrdersTable";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { authService } from "../services/authService";
 
 function Orders() {
     const navigate = useNavigate();
     const location = useLocation();
     const searchedOrders = location.state?.searchedOrders;
+
+    useEffect(() => {
+        console.log("Orders page - checking authentication");
+        const isAuth = authService.isAuthenticated();
+        console.log("Authentication result:", isAuth);
+
+        if (!isAuth) {
+            console.log("Not authenticated - redirecting to login");
+            navigate("/login");
+        } else {
+            console.log("Authenticated - staying on orders page");
+        }
+    }, [navigate]);
 
     const handleClearFilter = () => {
         // Navigate to /orders without state to clear the filter

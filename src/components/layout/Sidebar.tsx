@@ -1,6 +1,6 @@
 import "../../styles/sidebar.css";
 import Logo from "../../../public/packovery-full-logo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import OrdersIcon from "../../assets/icons/orders.tsx";
 import LogoutIcon from "../../assets/icons/logout.tsx";
 import WarningIcon from "../../assets/icons/warning.tsx";
@@ -8,9 +8,11 @@ import AlertIcon from "../../assets/icons/alert.tsx";
 import MenuIcon from "../../assets/icons/menu.tsx";
 import CloseIcon from "../../assets/icons/close.tsx";
 import { useState } from "react";
+import { authService } from "../../services/authService";
 
 function Sidebar({ currentPage }: { currentPage: string }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const navigate = useNavigate();
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -18,6 +20,12 @@ function Sidebar({ currentPage }: { currentPage: string }) {
 
     const closeMobileMenu = () => {
         setIsMobileMenuOpen(false);
+    };
+
+    const handleLogout = () => {
+        authService.logout();
+        closeMobileMenu();
+        navigate("/login");
     };
 
     return (
@@ -59,13 +67,9 @@ function Sidebar({ currentPage }: { currentPage: string }) {
                         <AlertIcon /> Configuratore Alert
                     </Link>
                 </div>
-                <Link
-                    to="/login"
-                    className="logout-link"
-                    onClick={closeMobileMenu}
-                >
-                    <LogoutIcon /> Esci
-                </Link>
+                <button className="logout-link" onClick={handleLogout}>
+                    <LogoutIcon /> <p>Esci</p>
+                </button>
             </div>
         </>
     );
