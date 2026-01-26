@@ -5,6 +5,7 @@ import "../styles/alerts.css";
 import Topbar from "../components/layout/Topbar";
 import BackArrow from "../assets/icons/back-arrow";
 import ArrowDropdown from "../assets/icons/dropdown-arrow";
+import { alertsService } from "../services/alertsService";
 
 const TYPES = [
   "Ritardo partenza ordine",
@@ -32,8 +33,22 @@ export default function CreateAlert() {
   }
 
   function submit() {
-    // TODO: wire to API / state
-    navigate("/alerts");
+    // wire to API
+    (async () => {
+      try {
+        await alertsService.createAlert({
+          name,
+          description,
+          type,
+          threshold: time,
+          active,
+        });
+        navigate("/alerts");
+      } catch (e: any) {
+        console.error(e);
+        alert(e.message || "Errore durante la creazione dell'alert");
+      }
+    })();
   }
 
   return (
