@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import "../styles/orders.css";
 import "../styles/alerts.css";
 import BackArrow from "../assets/icons/back-arrow";
+import Clock from "../assets/icons/clock";
 import Map from "../components/Map";
 import { ordersService } from "../services/ordersService";
 import type { OrderDetails as OrderDetailsType } from "../services/ordersService";
@@ -32,6 +33,31 @@ function OrderDetails() {
   const [lastPositionUpdate, setLastPositionUpdate] = useState<string | null>(
     null,
   );
+  const [riderAddress, setRiderAddress] = useState<string | null>(null);
+
+  const fetchAddress = async (lat: number, lng: number) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+      );
+      if (response.ok) {
+        const data = await response.json();
+        // Try to get city, town, village, or suburb
+        const address = data.address;
+        const city =
+          address.city ||
+          address.town ||
+          address.village ||
+          address.suburb ||
+          address.county;
+        if (city) {
+          setRiderAddress(city);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching address:", error);
+    }
+  };
 
   const updateRiderPosition = async (riderId: number) => {
     try {
@@ -41,6 +67,7 @@ function OrderDetails() {
         setRiderLocationData(position);
         setCurrentPosition([position.latitude, position.longitude]);
         setLastPositionUpdate(position.positionTimestamp);
+        fetchAddress(position.latitude, position.longitude);
       }
     } catch (error) {
       console.error("Error fetching rider position:", error);
@@ -203,23 +230,6 @@ function OrderDetails() {
               <BackArrow />
               Torna indietro
             </button>
-            {orderData.riderId && (
-              <button
-                type="button"
-                className="primary-btn"
-                onClick={async () => {
-                  if (orderData.riderId) {
-                    await updateRiderPosition(orderData.riderId);
-                  }
-                }}
-                disabled={loadingPosition}
-                style={{ marginLeft: "auto" }}
-              >
-                {loadingPosition
-                  ? "Aggiornamento..."
-                  : "🔄 Aggiorna posizione rider"}
-              </button>
-            )}
           </div>
 
           {/* Map Section */}
@@ -246,40 +256,36 @@ function OrderDetails() {
 
               <div className="location-info-card">
                 <h3 className="location-title">Posizione attuale del rider</h3>
-                {loadingPosition ? (
+
+                {loadingPosition && !currentPosition ? (
                   <p className="location-address">Caricamento...</p>
                 ) : currentPosition ? (
-                  <>
-                    <p className="location-address">In transito</p>
-                    {lastPositionUpdate && (
-                      <p
-                        className="location-coords"
-                        style={{
-                          color: "#666",
-                          fontSize: "0.9em",
-                          marginTop: "5px",
-                        }}
-                      >
-                        Aggiornato: {formatTimeAgo(lastPositionUpdate)}
-                      </p>
-                    )}
-                    {riderLocationData &&
-                      riderLocationData.distanceTraveled > 0 && (
-                        <p
-                          className="location-coords"
-                          style={{
-                            color: "#A7CF3B",
-                            fontSize: "0.9em",
-                            marginTop: "5px",
-                          }}
-                        >
-                          Distanza percorsa:{" "}
-                          {formatDistance(riderLocationData.distanceTraveled)}
+                  <div className="location-content">
+                    <p className="location-address">
+                      {riderAddress ? riderAddress : "In transito"}
+                    </p>
+
+                    <div className="location-meta-info">
+                      {lastPositionUpdate && (
+                        <p className="meta-text">
+                          <span className="meta-label">
+                            Ultimo rilevamento:
+                          </span>{" "}
+                          {formatTimeAgo(lastPositionUpdate)}
                         </p>
                       )}
-                  </>
+
+                      {riderLocationData &&
+                        riderLocationData.distanceTraveled > 0 && (
+                          <p className="meta-text">
+                            <span className="meta-label">Distanza:</span>{" "}
+                            {formatDistance(riderLocationData.distanceTraveled)}
+                          </p>
+                        )}
+                    </div>
+                  </div>
                 ) : (
-                  <p className="location-address">
+                  <p className="location-address" style={{ color: "#999" }}>
                     {orderData?.riderId
                       ? "Posizione non disponibile"
                       : "Nessun rider assegnato"}
