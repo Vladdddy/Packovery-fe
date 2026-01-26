@@ -1,73 +1,102 @@
-# React + TypeScript + Vite
+# Packovery Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Applicazione frontend per il sistema di gestione logistica e tracciamento Packovery. Sviluppata con React, TypeScript e Vite.
 
-Currently, two official plugins are available:
+## 🚀 Stack Tecnologico
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Framework**: [React 19](https://react.dev/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Linguaggio**: [TypeScript](https://www.typescriptlang.org/)
+- **Routing**: [React Router 7](https://reactrouter.com/)
+- **Mappe**: [Leaflet](https://leafletjs.com/) & [React Leaflet](https://react-leaflet.js.org/)
+- **Autenticazione**: JWT (JSON Web Tokens)
 
-## React Compiler
+## 🛠️ Prerequisiti
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Node.js** (È raccomandata l'ultima versione LTS)
+- **pnpm** (Gestore di pacchetti utilizzato in questo progetto)
 
-## Expanding the ESLint configuration
+## 📦 Installazione
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. Naviga nella directory del progetto:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+   ```bash
+   cd Packovery-fe
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+2. Installa le dipendenze:
+   ```bash
+   pnpm install
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## ▶️ Avvio dell'Applicazione
+
+### Modalità Sviluppo
+
+Per avviare il server di sviluppo con Hot Module Replacement (HMR):
+
+```bash
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+L'applicazione sarà disponibile su `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+> **Nota:** Il server di sviluppo è configurato per inoltrare (proxy) le richieste API al backend su `http://localhost:8080`. Assicurati che il servizio backend sia in esecuzione.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Build di Produzione
+
+Per compilare l'applicazione per la produzione:
+
+```bash
+pnpm build
 ```
+
+Per vedere un'anteprima della build di produzione localmente:
+
+```bash
+pnpm preview
+```
+
+## 📂 Struttura del Progetto
+
+```
+src/
+├── assets/          # Risorse statiche (icone, immagini)
+├── components/      # Componenti UI riutilizzabili
+├── functions/       # Funzioni di utilità condivise
+├── layout/          # Componenti di layout (Sidebar, Topbar)
+├── pages/           # Viste/rotte dell'applicazione
+├── services/        # Servizi di comunicazione API
+├── styles/          # Fogli di stile CSS
+├── App.tsx          # Componente principale dell'applicazione
+└── main.tsx         # Punto di ingresso (Entry point)
+```
+
+## ⚙️ Configurazione
+
+### Variabili d'Ambiente
+
+L'applicazione utilizza variabili d'ambiente per la configurazione. Puoi creare un file `.env` nella directory principale.
+
+- `VITE_API_BASE_URL`: URL base per l'API (il default è vuoto, affidandosi al proxy).
+
+### Configurazione Proxy (`vite.config.ts`)
+
+Il server di sviluppo Vite è configurato per inoltrare le richieste al backend:
+
+- `/api` -> `http://localhost:8080`
+- `/alert-rules` -> `http://localhost:8080`
+- `/alert-issues` -> `http://localhost:8080`
+- `/communications` -> `http://localhost:8080`
+
+## 🔑 Autenticazione
+
+L'applicazione utilizza JWT per l'autenticazione. I token sono salvati nel `localStorage`:
+
+- `accessToken`: Utilizzato per le richieste autenticate.
+- `refreshToken`: Utilizzato per aggiornare la sessione quando l'access token scade.
+
+## 🤝 Contribuire
+
+1. Assicurati che il codice sia formattato ed esegui il linting prima di fare un commit.
+2. Esegui `pnpm lint` per controllare eventuali problemi di qualità del codice.
