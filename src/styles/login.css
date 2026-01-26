@@ -124,7 +124,13 @@
     }
     & .blocked-user-message {
       width: 300px;
-      padding: 20px;
+      padding: 10px 12px;
+      background-color: #fee;
+      border: 1px solid #fcc;
+      border-radius: 8px;
+      color: #c00;
+      font-size: var(--paragraph-s);
+      margin-top: 2vh;
       text-align: center;
 
       & .blocked-icon {
@@ -133,7 +139,7 @@
       }
 
       & p {
-        color: #f70000;
+        color: #c00;
         font-size: var(--paragraph-s);
         margin: 8px 0;
         text-decoration: none;
@@ -141,14 +147,14 @@
 
         &.time-remaining {
           font-weight: 600;
-          color: #f70000;
+          color: #c00;
           margin-top: 12px;
           padding: 8px;
           border-radius: 6px;
         }
 
         &.contact-support {
-          color: #f70000;
+          color: #c00;
         }
       }
     }

@@ -14,10 +14,14 @@ interface LoginResponse {
   email: string;
 }
 
-interface ResetPasswordRequest {
+interface VerifyOtpRequest {
   otp: string;
-  newPassword: string;
   email: string;
+}
+
+interface NewPasswordRequest {
+  email: string;
+  password: string;
 }
 
 interface BlockedResponse {
@@ -99,13 +103,52 @@ async function fetchWithAuth(
 
 export const authService = {
   async login(data: LoginRequest): Promise<LoginResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    const url = `${API_BASE_URL}/api/auth/login`;
+    console.log("Login request:", {
+      url,
+      email: data.email,
+      hasPassword: !!data.password,
+    });
+
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
+
+    console.log("Login response:", {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get("content-type"),
+    });
+
+    // Check if response is JSON
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("Server returned non-JSON response:", {
+        status: response.status,
+        contentType,
+        url: response.url,
+        body: text.substring(0, 500), // Log first 500 chars for debugging
+      });
+
+      if (response.status === 401) {
+        throw new Error("Email o password errati. Riprova.");
+      } else if (response.status === 500) {
+        throw new Error(
+          "Server error occurred. Please try again later or contact support.",
+        );
+      } else if (response.status === 404) {
+        throw new Error(
+          "Login endpoint not found. Please check your API configuration.",
+        );
+      } else {
+        throw new Error(`Server error: ${response.status}. Please try again.`);
+      }
+    }
 
     const result = await response.json();
 
@@ -115,6 +158,11 @@ export const authService = {
         type: "USER_BLOCKED",
         data: result as BlockedResponse,
       };
+    }
+
+    // Handle 401 - Wrong credentials
+    if (response.status === 401) {
+      throw new Error("Email o password errati. Riprova.");
     }
 
     if (!response.ok) {
@@ -155,8 +203,22 @@ export const authService = {
           body: JSON.stringify({ refreshToken }),
         });
 
+        // Check if response is JSON
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          const text = await response.text();
+          console.error("Token refresh returned non-JSON response:", {
+            status: response.status,
+            contentType,
+            url: response.url,
+            body: text.substring(0, 500),
+          });
+          throw new Error("Session refresh failed. Please login again.");
+        }
+
         if (!response.ok) {
-          throw new Error("Token refresh failed");
+          const result = await response.json();
+          throw new Error(result.message || "Token refresh failed");
         }
 
         const result = await response.json();
@@ -184,6 +246,8 @@ export const authService = {
   },
 
   async requestPasswordReset(email: string): Promise<void> {
+    console.log("Request password reset for:", email);
+
     const response = await fetch(
       `${API_BASE_URL}/api/auth/request-reset-password`,
       {
@@ -195,25 +259,32 @@ export const authService = {
       },
     );
 
+    console.log("Request password reset response:", {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get("content-type"),
+    });
+
     if (!response.ok) {
-      let errorMessage = "Failed to request password reset";
-      try {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const error = await response.json();
-          errorMessage = error.message || error.error || JSON.stringify(error);
-        } else {
-          const text = await response.text();
-          errorMessage = text || `Server error: ${response.status}`;
-        }
-      } catch (e) {
-        errorMessage = `Server error: ${response.status}`;
-      }
+      // Backend returns plain text error messages
+      const errorText = await response.text();
+      console.error("Password reset request failed:", errorText);
+
+      const errorMessage =
+        errorText || `Errore ${response.status}: Impossibile inviare il codice`;
       throw new Error(errorMessage);
     }
+
+    // Success - OTP sent
+    console.log("Password reset OTP sent successfully");
   },
 
-  async resetPassword(data: ResetPasswordRequest): Promise<void> {
+  async verifyOtp(data: VerifyOtpRequest): Promise<void> {
+    console.log("Verify OTP request:", {
+      email: data.email,
+      hasOtp: !!data.otp,
+    });
+
     const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
       method: "POST",
       headers: {
@@ -222,22 +293,59 @@ export const authService = {
       body: JSON.stringify(data),
     });
 
+    console.log("Verify OTP response:", {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get("content-type"),
+    });
+
+    // Read response as text first (backend returns plain text)
+    const responseText = await response.text();
+    console.log("Response body:", responseText);
+
     if (!response.ok) {
-      let errorMessage = "Failed to reset password";
-      try {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const error = await response.json();
-          errorMessage = error.message || error.error || JSON.stringify(error);
-        } else {
-          const text = await response.text();
-          errorMessage = text || `Server error: ${response.status}`;
-        }
-      } catch (e) {
-        errorMessage = `Server error: ${response.status}`;
-      }
+      // Backend returns plain text error messages
+      const errorMessage =
+        responseText || `Errore ${response.status}: OTP non valido`;
       throw new Error(errorMessage);
     }
+
+    // Success - OTP is valid
+  },
+
+  async setNewPassword(data: NewPasswordRequest): Promise<void> {
+    console.log("Set new password request:", {
+      email: data.email,
+      hasPassword: !!data.password,
+    });
+
+    const response = await fetch(`${API_BASE_URL}/api/auth/new-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    console.log("Set new password response:", {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get("content-type"),
+    });
+
+    // Read response as text first (backend returns plain text)
+    const responseText = await response.text();
+    console.log("Response body:", responseText);
+
+    if (!response.ok) {
+      // Backend returns plain text error messages
+      const errorMessage =
+        responseText ||
+        `Errore ${response.status}: Impossibile reimpostare la password`;
+      throw new Error(errorMessage);
+    }
+
+    // Success - Password set successfully
   },
 
   logout() {
