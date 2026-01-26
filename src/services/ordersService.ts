@@ -1,3 +1,5 @@
+import { authService } from "./authService";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 interface Order {
@@ -31,8 +33,6 @@ export const ordersService = {
     size?: string;
     createdAt?: string;
   }): Promise<Order[]> {
-    const token = localStorage.getItem("accessToken");
-
     // Build query string from params
     const queryParams = new URLSearchParams();
     if (params) {
@@ -46,21 +46,34 @@ export const ordersService = {
     const queryString = queryParams.toString();
     const url = `${API_BASE_URL}/api/orders${queryString ? `?${queryString}` : ""}`;
 
-    const response = await fetch(url, {
+    const response = await authService.fetchWithAuth(url, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
     });
 
     if (!response.ok) {
       throw new Error(`Error fetching orders: ${response.statusText}`);
     }
 
-    const apiResponse: ApiResponse<Order[]> = await response.json();
+    const result = await response.json();
+    console.log("Orders API response:", result);
 
-    return apiResponse.data || [];
+    // Extract data from the response wrapper
+    let orders = result;
+    
+    // Check if response has a data field (ApiResponse structure)
+    if (result.data) {
+      orders = result.data;
+      console.log("Extracted orders from result.data:", orders);
+    }
+
+    // Ensure we always return an array
+    if (!Array.isArray(orders)) {
+      console.error("Orders is not an array:", orders);
+      return [];
+    }
+
+    console.log(`Returning ${orders.length} orders`);
+    return orders;
   },
 
   async getOrderById(id: string): Promise<Order[]> {
