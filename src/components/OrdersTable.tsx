@@ -1,10 +1,18 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../styles/orders.css";
 import InfoIcon from "../assets/icons/info.tsx";
 import { ordersService } from "../services/ordersService.ts";
 
 interface Order {
+  id: string;
+  stato: string;
+  partenza: string;
+  destinazione: string;
+  data: string;
+  peso: string;
+  dimensione: string;
   id: string;
   stato: string;
   partenza: string;
@@ -82,6 +90,10 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setHasAnimated(true);
   }, []);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setHasAnimated(true);
+  }, []);
     useEffect(() => {
         setHasAnimated(true);
         if (searchedOrders) {
@@ -100,7 +112,15 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
       setCurrentPage(page);
     }
   };
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
+  // Generate dynamic page numbers based on current page
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
   // Generate dynamic page numbers based on current page
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
@@ -120,6 +140,30 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
             return pages;
         }
 
+    if (currentPage <= 3) {
+      // Show first 3 pages
+      for (let i = 1; i <= Math.min(3, totalPages); i++) {
+        pages.push(i);
+      }
+      if (totalPages > 4) {
+        pages.push("...");
+      }
+      if (totalPages > 3) {
+        pages.push(totalPages);
+      }
+    } else if (currentPage >= totalPages - 2) {
+      // Show last 3 pages
+      for (let i = Math.max(totalPages - 2, 1); i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show current page and neighbors (sliding window)
+      pages.push(currentPage - 1);
+      pages.push(currentPage);
+      pages.push(currentPage + 1);
+      pages.push("...");
+      pages.push(totalPages);
+    }
     if (currentPage <= 3) {
       // Show first 3 pages
       for (let i = 1; i <= Math.min(3, totalPages); i++) {
@@ -199,6 +243,8 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
             pages.push(totalPages);
         }
 
+    return pages;
+  };
     return pages;
   };
     return pages;
@@ -318,6 +364,39 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
                 </table>
             </div>
 
+      <div className="pagination">
+        <button
+          className="pagination-button"
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          ‹
+        </button>
+        {getPageNumbers().map((page, index) =>
+          typeof page === "number" ? (
+            <button
+              key={page}
+              className={`pagination-button ${currentPage === page ? "active" : ""}`}
+              onClick={() => handlePageChange(page)}
+            >
+              {page}
+            </button>
+          ) : (
+            <span key={`dots-${index}`} className="pagination-dots">
+              {page}
+            </span>
+          ),
+        )}
+        <button
+          className="pagination-button"
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          ›
+        </button>
+      </div>
+    </div>
+  );
       <div className="pagination">
         <button
           className="pagination-button"

@@ -2,13 +2,52 @@ import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
 import "../styles/orders.css";
+import "../styles/alerts.css";
+import BackArrow from "../assets/icons/back-arrow";
+import Map from "../components/Map";
 import "../styles/alerts.css";
 import BackArrow from "../assets/icons/back-arrow";
 import Map from "../components/Map";
 
 function OrderDetails() {
   const navigate = useNavigate();
+  const { id } = useParams();
+
+  const [orderData, setOrderData] = useState({
+    creatorName: "",
+    creatorSurname: "",
+    status: "",
+    creationDate: "",
+    weight: "",
+    dimension: "",
+  });
+
+  const [riderData, setRiderData] = useState({
+    name: "",
+    surname: "",
+    expectedArrival: "",
+    transport: "",
+  });
+
+  const [selectionMode, setSelectionMode] = useState<
+    "departure" | "arrival" | null
+  >(null);
+
+  const handleOrderChange = (field: string, value: string) => {
+    setOrderData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleRiderChange = (field: string, value: string) => {
+    setRiderData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleMapClick = (latlng: [number, number]) => {
+    // Map click handler can be used for future features if needed
+    console.log("Map clicked:", latlng);
+  };
   const { id } = useParams();
 
   const [orderData, setOrderData] = useState({
