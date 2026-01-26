@@ -536,7 +536,9 @@ function OrderDetails() {
         </main>
         {/* Floating chat button and drawer (only if a rider is assigned) */}
         {orderData?.riderId && (
-          <div className={`chat-fab-wrapper`}>
+          <>
+            <div className={`chat-backdrop ${chatOpen ? 'open' : ''}`} onClick={() => setChatOpen(false)} aria-hidden={!chatOpen} />
+            <div className={`chat-fab-wrapper`}>
             <button className="chat-fab" onClick={toggleChat} aria-label="Apri chat rider">
             {/* simple chat icon */}
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
