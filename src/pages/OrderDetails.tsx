@@ -27,29 +27,9 @@ function OrderDetails() {
     transport: "",
   });
 
-  const handleOrderChange = (field: string, value: string) => {
-    setOrderData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleRiderChange = (field: string, value: string) => {
-    setRiderData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const [orderData, setOrderData] = useState({
-    creatorName: "",
-    creatorSurname: "",
-    status: "",
-    creationDate: "",
-    weight: "",
-    dimension: "",
-  });
-
-  const [riderData, setRiderData] = useState({
-    name: "",
-    surname: "",
-    expectedArrival: "",
-    transport: "",
-  });
+  const [selectionMode, setSelectionMode] = useState<
+    "departure" | "arrival" | null
+  >(null);
 
   const handleOrderChange = (field: string, value: string) => {
     setOrderData((prev) => ({ ...prev, [field]: value }));
@@ -57,6 +37,11 @@ function OrderDetails() {
 
   const handleRiderChange = (field: string, value: string) => {
     setRiderData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleMapClick = (latlng: [number, number]) => {
+    // Map click handler can be used for future features if needed
+    console.log("Map clicked:", latlng);
   };
 
   return (
@@ -80,33 +65,11 @@ function OrderDetails() {
           <section className="map-section">
             <div className="map-container">
               <Map
-                departure={departureLocation}
-                arrival={arrivalLocation}
-                currentPosition={currentPosition}
+                orderId={id ? parseInt(id) : undefined}
+                autoRefresh={true}
+                refreshInterval={30000}
                 onMapClick={handleMapClick}
-                selectionMode={selectionMode}
               />
-            </div>
-
-            <div className="location-info-grid">
-              <div className="location-info-card">
-                <h3 className="location-title">Luogo di partenza</h3>
-                <p className="location-address">{departureAddress}</p>
-              </div>
-
-              <div className="location-info-card">
-                <h3 className="location-title">Posizione attuale</h3>
-                <p className="location-address">
-                  {currentPosition
-                    ? `${currentPosition[0].toFixed(6)}, ${currentPosition[1].toFixed(6)}`
-                    : "Non disponibile"}
-                </p>
-              </div>
-
-              <div className="location-info-card">
-                <h3 className="location-title">Luogo di arrivo</h3>
-                <p className="location-address">{arrivalAddress}</p>
-              </div>
             </div>
           </section>
 
