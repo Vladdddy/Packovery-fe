@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Logo from "../../../public/packovery-full-logo.png";
 import "../../styles/login.css";
 import { authService } from "../../services/authService";
@@ -8,6 +9,7 @@ interface InsertEmailProps {
 }
 
 function InsertEmail({ onSubmit }: InsertEmailProps) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,9 +45,6 @@ function InsertEmail({ onSubmit }: InsertEmailProps) {
             Inserisci l'email del tuo account. Ti invieremo un codice per
             modificare la tua password.
           </h2>
-          {error && (
-            <div className="error-message animate-fade-in">{error}</div>
-          )}
           <div className="row animate-slide-right-delay-3">
             <label htmlFor="email">Email</label>
             <input
@@ -58,13 +57,20 @@ function InsertEmail({ onSubmit }: InsertEmailProps) {
             />
           </div>
           <div className="buttons animate-slide-right-delay-4">
-            <button type="button" className="secondary-btn">
+            <button
+              type="button"
+              className="secondary-btn"
+              onClick={() => navigate("/login")}
+            >
               Annulla
             </button>
             <button type="submit" disabled={loading}>
               {loading ? "Invio..." : "Invia codice"}
             </button>
           </div>
+          {error && (
+            <div className="error-message animate-fade-in">{error}</div>
+          )}
         </form>
       </div>
     </div>

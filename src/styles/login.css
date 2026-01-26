@@ -122,6 +122,42 @@
       margin-top: 2vh;
       text-align: center;
     }
+    & .blocked-user-message {
+      width: 300px;
+      padding: 10px 12px;
+      background-color: #fee;
+      border: 1px solid #fcc;
+      border-radius: 8px;
+      color: #c00;
+      font-size: var(--paragraph-s);
+      margin-top: 2vh;
+      text-align: center;
+
+      & .blocked-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+
+      & p {
+        color: #c00;
+        font-size: var(--paragraph-s);
+        margin: 8px 0;
+        text-decoration: none;
+        cursor: default;
+
+        &.time-remaining {
+          font-weight: 600;
+          color: #c00;
+          margin-top: 12px;
+          padding: 8px;
+          border-radius: 6px;
+        }
+
+        &.contact-support {
+          color: #c00;
+        }
+      }
+    }
     & button {
       width: 300px;
       height: 40px;

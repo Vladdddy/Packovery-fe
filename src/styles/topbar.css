@@ -20,9 +20,17 @@
   padding: 20px;
   background-color: var(--bento-bg);
   border-bottom: 1px solid var(--bento-stroke);
-  flex: 1;
   min-height: 80px;
   animation: fadeInDown 0.3s ease-out;
+  position: fixed;
+  top: 0;
+  left: 250px;
+  right: 0;
+  z-index: 99;
+
+  @media (max-width: 1024px) {
+    left: 0;
+  }
 
   & h1 {
     font-size: var(--title-m);

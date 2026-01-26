@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/orders.css";
 import InfoIcon from "../assets/icons/info.tsx";
 import { ordersService } from "../services/ordersService.ts";
@@ -84,15 +85,6 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
 
-    // If no pages, return empty array
-    if (totalPages === 0) return [];
-
-    // If only one page, just show it
-    if (totalPages === 1) {
-      pages.push(1);
-      return pages;
-    }
-
     if (currentPage <= 3) {
       // Show first 3 pages
       for (let i = 1; i <= Math.min(3, totalPages); i++) {
@@ -106,17 +98,11 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
       }
     } else if (currentPage >= totalPages - 2) {
       // Show last 3 pages
-      pages.push(1);
-      if (totalPages > 4) {
-        pages.push("...");
-      }
       for (let i = Math.max(totalPages - 2, 1); i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
       // Show current page and neighbors (sliding window)
-      pages.push(1);
-      pages.push("...");
       pages.push(currentPage - 1);
       pages.push(currentPage);
       pages.push(currentPage + 1);

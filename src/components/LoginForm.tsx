@@ -4,13 +4,14 @@ import View from "../assets/icons/view";
 import Hide from "../assets/icons/hide";
 import "../styles/login.css";
 import { useNavigate } from "react-router-dom";
-import { authService } from "../services/authService";
+import { authService, type UserBlockedError } from "../services/authService";
 
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [blockedUser, setBlockedUser] = useState<UserBlockedError | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -26,15 +27,22 @@ function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setBlockedUser(null);
     setLoading(true);
 
     try {
       await authService.login({ email, password });
       navigate("/orders");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Login failed. Please try again.",
-      );
+      if ((err as UserBlockedError).type === "USER_BLOCKED") {
+        setBlockedUser(err as UserBlockedError);
+      } else {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Login failed. Please try again.",
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -58,6 +66,7 @@ function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
             />
           </div>
           <div className="row password-field animate-fade-in-delay-3">
@@ -70,6 +79,7 @@ function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="current-password"
               />
               <button
                 type="button"
@@ -95,6 +105,28 @@ function LoginForm() {
           >
             {loading ? "Accesso in corso..." : "Accedi"}
           </button>
+          {blockedUser && (
+            <div className="blocked-user-message animate-fade-in">
+              <p className="warning-text">
+                {blockedUser.data.permanent
+                  ? "Account bloccato:"
+                  : "Account temporaneamente bloccato:"}{" "}
+                <br />
+                {!blockedUser.data.permanent &&
+                  blockedUser.data.minutesLeft && (
+                    <>
+                      Potrai riprovare tra {blockedUser.data.minutesLeft}{" "}
+                      {blockedUser.data.minutesLeft === 1 ? "minuto" : "minuti"}
+                    </>
+                  )}
+              </p>
+              {blockedUser.data.permanent && (
+                <p className="contact-support">
+                  Contatta il supporto per riattivare il tuo account.
+                </p>
+              )}
+            </div>
+          )}
           {error && (
             <div className="error-message animate-fade-in">{error}</div>
           )}

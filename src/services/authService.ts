@@ -10,30 +10,107 @@ interface LoginRequest {
 interface LoginResponse {
   accessToken: string;
   refreshToken: string;
-  user?: {
-    email: string;
-    firstName: string;
-    lastName: string;
+  message: string;
+  email: string;
+}
+
+interface VerifyOtpRequest {
+  otp: string;
+  email: string;
+}
+
+interface NewPasswordRequest {
+  email: string;
+  password: string;
+}
+
+interface BlockedResponse {
+  message: string;
+  email: string;
+  permanent: boolean;
+  blockedUntil: string | null;
+  minutesLeft: number | null;
+}
+
+export interface UserBlockedError {
+  type: "USER_BLOCKED";
+  data: BlockedResponse;
+}
+
+// Track if a refresh is in progress to avoid multiple simultaneous refresh attempts
+let isRefreshing = false;
+let refreshPromise: Promise<LoginResponse> | null = null;
+
+// Helper function to decode JWT and check expiration
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const expirationTime = payload.exp * 1000; // Convert to milliseconds
+    const currentTime = Date.now();
+    // Consider token expired if it expires within the next 60 seconds
+    return currentTime >= expirationTime - 60000;
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return true;
+  }
+}
+
+// Helper function to make authenticated requests with auto-retry on 401
+async function fetchWithAuth(
+  url: string,
+  options: RequestInit = {},
+): Promise<Response> {
+  const accessToken = localStorage.getItem("accessToken");
+
+  // Add authorization header
+  const headers = {
+    ...options.headers,
+    Authorization: `Bearer ${accessToken}`,
   };
-}
 
-interface RefreshTokenRequest {
-  refreshToken: string;
-}
+  // Make the request
+  let response = await fetch(url, { ...options, headers });
 
-interface ForgotPasswordRequest {
-  email: string;
-}
+  // If we get a 401, try to refresh the token and retry
+  if (response.status === 401) {
+    const refreshToken = localStorage.getItem("refreshToken");
 
-interface ResetPasswordRequest {
-  code: string;
-  newPassword: string;
-  email: string;
+    if (!refreshToken) {
+      // No refresh token available, logout
+      authService.logout();
+      window.location.href = "/login";
+      throw new Error("Authentication required");
+    }
+
+    try {
+      // Refresh the token
+      await authService.refreshToken(refreshToken);
+
+      // Retry the original request with the new token
+      const newAccessToken = localStorage.getItem("accessToken");
+      headers["Authorization"] = `Bearer ${newAccessToken}`;
+      response = await fetch(url, { ...options, headers });
+    } catch (error) {
+      // Refresh failed, logout
+      authService.logout();
+      window.location.href = "/login";
+      throw new Error("Session expired. Please login again.");
+    }
+  }
+
+  return response;
 }
 
 export const authService = {
   async login(data: LoginRequest): Promise<LoginResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    const url = `${API_BASE_URL}/api/auth/login`;
+    console.log("Login request:", {
+      url,
+      email: data.email,
+      hasPassword: !!data.password,
+    });
+
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -41,118 +118,136 @@ export const authService = {
       body: JSON.stringify(data),
     });
 
-    if (!response.ok) {
-      let errorMessage = "Login failed";
-      try {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const error = await response.json();
-          errorMessage = error.message || error.error || JSON.stringify(error);
-          console.error("Login error response:", error);
-        } else {
-          const text = await response.text();
-          errorMessage = text || `Server error: ${response.status}`;
-          console.error("Login error text:", text);
-        }
-      } catch (e) {
-        errorMessage = `Server error: ${response.status}`;
-        console.error("Error parsing response:", e);
+    console.log("Login response:", {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get("content-type"),
+    });
+
+    // Check if response is JSON
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("Server returned non-JSON response:", {
+        status: response.status,
+        contentType,
+        url: response.url,
+        body: text.substring(0, 500), // Log first 500 chars for debugging
+      });
+
+      if (response.status === 401) {
+        throw new Error("Email o password errati. Riprova.");
+      } else if (response.status === 500) {
+        throw new Error(
+          "Server error occurred. Please try again later or contact support.",
+        );
+      } else if (response.status === 404) {
+        throw new Error(
+          "Login endpoint not found. Please check your API configuration.",
+        );
+      } else {
+        throw new Error(`Server error: ${response.status}. Please try again.`);
       }
-      throw new Error(errorMessage);
     }
 
     const result = await response.json();
 
-    console.log("Login response:", result);
-    console.log("Login response structure:", JSON.stringify(result, null, 2));
-
-    // Store tokens in localStorage - handle different response structures
-    let accessToken = result.accessToken || result.access_token;
-    let refreshToken = result.refreshToken || result.refresh_token;
-
-    // Check if tokens are nested in a data object
-    if (!accessToken && result.data) {
-      accessToken = result.data.accessToken || result.data.access_token;
-      refreshToken = result.data.refreshToken || result.data.refresh_token;
+    // Check for blocked user in response
+    if (result.permanent !== undefined) {
+      throw {
+        type: "USER_BLOCKED",
+        data: result as BlockedResponse,
+      };
     }
+
+    // Handle 401 - Wrong credentials
+    if (response.status === 401) {
+      throw new Error("Email o password errati. Riprova.");
+    }
+
+    if (!response.ok) {
+      // Throw the specific error message from the backend
+      throw new Error(result.message || result.error || "Login failed");
+    }
+
+    // Supporta sia token che accessToken
+    const accessToken = result.accessToken ?? result.token;
 
     if (accessToken) {
-      console.log("Saving accessToken:", accessToken.substring(0, 20) + "...");
       localStorage.setItem("accessToken", accessToken);
-    } else {
-      console.error("No access token found in response!");
+    }
+    if (result.refreshToken) {
+      localStorage.setItem("refreshToken", result.refreshToken);
     }
 
-    if (refreshToken) {
-      console.log(
-        "Saving refreshToken:",
-        refreshToken.substring(0, 20) + "...",
-      );
-      localStorage.setItem("refreshToken", refreshToken);
-    } else {
-      console.error("No refresh token found in response!");
-    }
-
-    // Verify tokens were saved
-    const savedAccessToken = localStorage.getItem("accessToken");
-    const savedRefreshToken = localStorage.getItem("refreshToken");
-    console.log(
-      "Verified saved accessToken:",
-      savedAccessToken
-        ? savedAccessToken.substring(0, 20) + "..."
-        : "NOT SAVED",
-    );
-    console.log(
-      "Verified saved refreshToken:",
-      savedRefreshToken
-        ? savedRefreshToken.substring(0, 20) + "..."
-        : "NOT SAVED",
-    );
-
-    return result;
+    return {
+      ...result,
+      accessToken,
+    };
   },
 
   async refreshToken(refreshToken: string): Promise<LoginResponse> {
-    console.log("Attempting to refresh token...");
-    const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ refreshToken }),
-    });
-
-    if (!response.ok) {
-      console.error("Token refresh failed with status:", response.status);
-      throw new Error("Token refresh failed");
+    // Prevent multiple simultaneous refresh attempts
+    if (isRefreshing && refreshPromise) {
+      return refreshPromise;
     }
 
-    const result = await response.json();
-    console.log("Refresh token response:", result);
+    isRefreshing = true;
+    refreshPromise = (async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ refreshToken }),
+        });
 
-    // Update tokens in localStorage - handle different response structures
-    let accessToken = result.accessToken || result.access_token;
-    let newRefreshToken = result.refreshToken || result.refresh_token;
+        // Check if response is JSON
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          const text = await response.text();
+          console.error("Token refresh returned non-JSON response:", {
+            status: response.status,
+            contentType,
+            url: response.url,
+            body: text.substring(0, 500),
+          });
+          throw new Error("Session refresh failed. Please login again.");
+        }
 
-    // Check if tokens are nested in a data object
-    if (!accessToken && result.data) {
-      accessToken = result.data.accessToken || result.data.access_token;
-      newRefreshToken = result.data.refreshToken || result.data.refresh_token;
-    }
+        if (!response.ok) {
+          const result = await response.json();
+          throw new Error(result.message || "Token refresh failed");
+        }
 
-    if (accessToken) {
-      console.log("Updating accessToken after refresh");
-      localStorage.setItem("accessToken", accessToken);
-    }
-    if (newRefreshToken) {
-      console.log("Updating refreshToken after refresh");
-      localStorage.setItem("refreshToken", newRefreshToken);
-    }
+        const result = await response.json();
 
-    return result;
+        const accessToken = result.accessToken ?? result.token;
+
+        if (accessToken) {
+          localStorage.setItem("accessToken", accessToken);
+        }
+        if (result.refreshToken) {
+          localStorage.setItem("refreshToken", result.refreshToken);
+        }
+
+        return {
+          ...result,
+          accessToken,
+        };
+      } finally {
+        isRefreshing = false;
+        refreshPromise = null;
+      }
+    })();
+
+    return refreshPromise;
   },
 
   async requestPasswordReset(email: string): Promise<void> {
+    console.log("Request password reset for:", email);
+
     const response = await fetch(
       `${API_BASE_URL}/api/auth/request-reset-password`,
       {
@@ -164,13 +259,32 @@ export const authService = {
       },
     );
 
+    console.log("Request password reset response:", {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get("content-type"),
+    });
+
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to request password reset");
+      // Backend returns plain text error messages
+      const errorText = await response.text();
+      console.error("Password reset request failed:", errorText);
+
+      const errorMessage =
+        errorText || `Errore ${response.status}: Impossibile inviare il codice`;
+      throw new Error(errorMessage);
     }
+
+    // Success - OTP sent
+    console.log("Password reset OTP sent successfully");
   },
 
-  async resetPassword(data: ResetPasswordRequest): Promise<void> {
+  async verifyOtp(data: VerifyOtpRequest): Promise<void> {
+    console.log("Verify OTP request:", {
+      email: data.email,
+      hasOtp: !!data.otp,
+    });
+
     const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
       method: "POST",
       headers: {
@@ -179,10 +293,59 @@ export const authService = {
       body: JSON.stringify(data),
     });
 
+    console.log("Verify OTP response:", {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get("content-type"),
+    });
+
+    // Read response as text first (backend returns plain text)
+    const responseText = await response.text();
+    console.log("Response body:", responseText);
+
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to reset password");
+      // Backend returns plain text error messages
+      const errorMessage =
+        responseText || `Errore ${response.status}: OTP non valido`;
+      throw new Error(errorMessage);
     }
+
+    // Success - OTP is valid
+  },
+
+  async setNewPassword(data: NewPasswordRequest): Promise<void> {
+    console.log("Set new password request:", {
+      email: data.email,
+      hasPassword: !!data.password,
+    });
+
+    const response = await fetch(`${API_BASE_URL}/api/auth/new-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    console.log("Set new password response:", {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get("content-type"),
+    });
+
+    // Read response as text first (backend returns plain text)
+    const responseText = await response.text();
+    console.log("Response body:", responseText);
+
+    if (!response.ok) {
+      // Backend returns plain text error messages
+      const errorMessage =
+        responseText ||
+        `Errore ${response.status}: Impossibile reimpostare la password`;
+      throw new Error(errorMessage);
+    }
+
+    // Success - Password set successfully
   },
 
   logout() {
@@ -199,102 +362,51 @@ export const authService = {
   },
 
   isAuthenticated(): boolean {
-    return !!this.getAccessToken();
-  },
-
-  async fetchWithAuth(
-    url: string,
-    options: RequestInit = {},
-  ): Promise<Response> {
     const token = this.getAccessToken();
+    if (!token) return false;
 
-    console.log("fetchWithAuth - URL:", url);
-    console.log(
-      "fetchWithAuth - Token:",
-      token ? `${token.substring(0, 20)}...` : "NO TOKEN",
-    );
-
-    if (!token) {
-      console.error("No access token found, redirecting to login");
-      this.logout();
-      window.location.href = "/login";
-      throw new Error("No access token. Please login.");
-    }
-
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-
-    // Merge any additional headers from options
-    if (options.headers) {
-      const optionsHeaders = options.headers as Record<string, string>;
-      Object.keys(optionsHeaders).forEach((key) => {
-        if (
-          key.toLowerCase() !== "content-type" &&
-          key.toLowerCase() !== "authorization"
-        ) {
-          headers[key] = optionsHeaders[key];
-        }
-      });
-    }
-
-    console.log("fetchWithAuth - Request headers:", headers);
-
-    let response = await fetch(url, {
-      ...options,
-      headers,
-    });
-
-    console.log("fetchWithAuth - Response status:", response.status);
-
-    // If we get a 401, try to refresh the token and retry
-    if (response.status === 401) {
-      console.log("Got 401, attempting token refresh...");
+    // Check if token is expired
+    if (isTokenExpired(token)) {
+      // Try to refresh if we have a refresh token
       const refreshToken = this.getRefreshToken();
       if (refreshToken) {
-        try {
-          await this.refreshToken(refreshToken);
-          // Retry the original request with new token
-          const newToken = this.getAccessToken();
-          console.log("Token refreshed, retrying request with new token");
-
-          const newHeaders: Record<string, string> = {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${newToken}`,
-          };
-
-          // Merge any additional headers from options
-          if (options.headers) {
-            const optionsHeaders = options.headers as Record<string, string>;
-            Object.keys(optionsHeaders).forEach((key) => {
-              if (
-                key.toLowerCase() !== "content-type" &&
-                key.toLowerCase() !== "authorization"
-              ) {
-                newHeaders[key] = optionsHeaders[key];
-              }
-            });
-          }
-
-          response = await fetch(url, { ...options, headers: newHeaders });
-          console.log("Retry response status:", response.status);
-        } catch (error) {
-          console.error("Token refresh failed:", error);
-          // Refresh failed, logout and redirect to login
+        // Trigger refresh in background
+        this.refreshToken(refreshToken).catch(() => {
           this.logout();
-          window.location.href = "/login";
-          throw new Error("Session expired. Please login again.");
-        }
+        });
       } else {
-        console.error("No refresh token available");
-        // No refresh token, logout and redirect
         this.logout();
-        window.location.href = "/login";
-        throw new Error("Session expired. Please login again.");
+        return false;
       }
     }
 
-    return response;
+    return true;
   },
+
+  // New method to check token expiration without triggering refresh
+  isTokenExpired(): boolean {
+    const token = this.getAccessToken();
+    if (!token) return true;
+    return isTokenExpired(token);
+  },
+
+  // Export the fetchWithAuth helper for use in other services
+  fetchWithAuth,
+};
+
+export const userService = {
+  getAll: () =>
+    authService
+      .fetchWithAuth(`${API_BASE_URL}/api/users`)
+      .then((r) => r.json()),
+
+  getById: (id: number) =>
+    authService
+      .fetchWithAuth(`${API_BASE_URL}/api/users/${id}`)
+      .then((r) => r.json()),
+
+  delete: (id: number) =>
+    authService.fetchWithAuth(`${API_BASE_URL}/api/users/${id}`, {
+      method: "DELETE",
+    }),
 };

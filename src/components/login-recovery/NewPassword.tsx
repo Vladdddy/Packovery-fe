@@ -6,10 +6,10 @@ import { authService } from "../../services/authService";
 
 interface NewPasswordProps {
   email: string;
-  code: string;
+  onBack?: () => void;
 }
 
-function NewPassword({ email, code }: NewPasswordProps) {
+function NewPassword({ email, onBack }: NewPasswordProps) {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -33,14 +33,17 @@ function NewPassword({ email, code }: NewPasswordProps) {
     setLoading(true);
 
     try {
-      await authService.resetPassword({
+      await authService.setNewPassword({
         email,
-        code,
-        newPassword: password,
+        password,
       });
       navigate("/login");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to reset password");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Impossibile reimpostare la password",
+      );
     } finally {
       setLoading(false);
     }
@@ -83,7 +86,11 @@ function NewPassword({ email, code }: NewPasswordProps) {
             />
           </div>
           <div className="buttons animate-slide-right-delay-5">
-            <button type="button" className="secondary-btn">
+            <button
+              type="button"
+              className="secondary-btn"
+              onClick={() => navigate("/login")}
+            >
               Annulla
             </button>
             <button type="submit" disabled={loading}>

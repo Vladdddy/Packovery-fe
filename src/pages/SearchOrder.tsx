@@ -95,36 +95,34 @@ function SearchOrder() {
                                 />
                             </div>
 
-                            <div className="row">
-                                <label className="pv-label">Stato</label>
-                                <div
-                                    className="pv-select"
-                                    onClick={() => setStatoOpen((v) => !v)}
-                                    role="button"
-                                    tabIndex={0}
-                                >
-                                    <div className="pv-select-value">
-                                        {stato || "..."}
-                                    </div>
-                                    <ArrowDropdown />
-                                    {statoOpen && (
-                                        <ul className="pv-select-list">
-                                            {STATUS.map((t) => (
-                                                <li
-                                                    key={t}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setStato(t);
-                                                        setStatoOpen(false);
-                                                    }}
-                                                >
-                                                    {t}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
-                            </div>
+              <div className="row">
+                <label className="pv-label">Stato</label>
+                <div
+                  className="pv-select"
+                  onClick={() => setStatoOpen((v) => !v)}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="pv-select-value">{stato || "..."}</div>
+                  <ArrowDropdown />
+                  {statoOpen && (
+                    <ul className="pv-select-list">
+                      {STATUS.map((t) => (
+                        <li
+                          key={t}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setStato(t);
+                            setStatoOpen(false);
+                          }}
+                        >
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
 
                             <div className="row">
                                 <label className="pv-label">
@@ -166,69 +164,63 @@ function SearchOrder() {
                                 />
                             </div>
 
-                            <div className="row">
-                                <label className="pv-label">Peso</label>
-                                <div
-                                    className="pv-select"
-                                    onClick={() => setPesoOpen((v) => !v)}
-                                    role="button"
-                                    tabIndex={0}
-                                >
-                                    <div className="pv-select-value">
-                                        {peso || "..."}
-                                    </div>
-                                    <ArrowDropdown />
-                                    {pesoOpen && (
-                                        <ul className="pv-select-list">
-                                            {WEIGHT.map((t) => (
-                                                <li
-                                                    key={t}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setPeso(t);
-                                                        setPesoOpen(false);
-                                                    }}
-                                                >
-                                                    {t}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
-                            </div>
+              <div className="row">
+                <label className="pv-label">Peso</label>
+                <div
+                  className="pv-select"
+                  onClick={() => setPesoOpen((v) => !v)}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="pv-select-value">{peso || "..."}</div>
+                  <ArrowDropdown />
+                  {pesoOpen && (
+                    <ul className="pv-select-list">
+                      {WEIGHT.map((t) => (
+                        <li
+                          key={t}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPeso(t);
+                            setPesoOpen(false);
+                          }}
+                        >
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
 
-                            <div className="row">
-                                <label className="pv-label">Dimensione</label>
-                                <div
-                                    className="pv-select"
-                                    onClick={() => setDimensioneOpen((v) => !v)}
-                                    role="button"
-                                    tabIndex={0}
-                                >
-                                    <div className="pv-select-value">
-                                        {dimensione || "..."}
-                                    </div>
-                                    <ArrowDropdown />
-                                    {dimensioneOpen && (
-                                        <ul className="pv-select-list">
-                                            {DIMENSION.map((t) => (
-                                                <li
-                                                    key={t}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setDimensione(t);
-                                                        setDimensioneOpen(
-                                                            false,
-                                                        );
-                                                    }}
-                                                >
-                                                    {t}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
-                            </div>
+              <div className="row">
+                <label className="pv-label">Dimensione</label>
+                <div
+                  className="pv-select"
+                  onClick={() => setDimensioneOpen((v) => !v)}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="pv-select-value">{dimensione || "..."}</div>
+                  <ArrowDropdown />
+                  {dimensioneOpen && (
+                    <ul className="pv-select-list">
+                      {DIMENSION.map((t) => (
+                        <li
+                          key={t}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDimensione(t);
+                            setDimensioneOpen(false);
+                          }}
+                        >
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
 
                             <div className="row">
                                 <label className="pv-label hidden-label">
@@ -254,8 +246,11 @@ function SearchOrder() {
                     </form>
                 </main>
             </div>
-        </section>
-    );
+          </form>
+        </main>
+      </div>
+    </section>
+  );
 }
 
 export default SearchOrder;
