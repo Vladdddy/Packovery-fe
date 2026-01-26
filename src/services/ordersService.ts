@@ -1,28 +1,46 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 interface Order {
-    id: bigint;
-    actual_size: number;
-    actual_weight: number;
-    created_at: string;
-    creation_date: string;
-    oversize: boolean;
-    overweight: boolean;
-    package_size: string;
-    package_weight: string;
-    sender_id: bigint;
+    id: number;
+    trackingCode: string;
+    creationDate: string;
+    deliveryCity: string | null;
+    deliveryProvince: string | null;
+    pickUpCity: string | null;
+    pickUpProvince: string | null;
+    size: string;
     status: string;
-    tracking_code: string;
-    updated_at: string;
-    rider_id: bigint;
-    vehicle_id: bigint;
+    weight: string;
 }
 
 export const ordersService = {
-    async fetchOrders(): Promise<Order[]> {
+    async fetchOrders(params?: {
+        id?: string;
+        status?: string;
+        pickUpCity?: string;
+        pickUpProvince?: string;
+        deliveryCity?: string;
+        deliveryProvince?: string;
+        weight?: string;
+        size?: string;
+        createdAt?: string;
+    }): Promise<Order[]> {
         const token = localStorage.getItem("accessToken");
 
-        const response = await fetch(`${API_BASE_URL}/api/orders`, {
+        // Build query string from params
+        const queryParams = new URLSearchParams();
+        if (params) {
+            Object.entries(params).forEach(([key, value]) => {
+                if (value) {
+                    queryParams.append(key, value);
+                }
+            });
+        }
+
+        const queryString = queryParams.toString();
+        const url = `${API_BASE_URL}/api/orders${queryString ? `?${queryString}` : ""}`;
+
+        const response = await fetch(url, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -37,5 +55,9 @@ export const ordersService = {
         const data: Order[] = await response.json();
 
         return data;
+    },
+
+    async getOrderById(id: string): Promise<Order[]> {
+        return this.fetchOrders({ id });
     },
 };
