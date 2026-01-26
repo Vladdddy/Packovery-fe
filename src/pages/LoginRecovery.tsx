@@ -6,7 +6,6 @@ import NewPassword from "../components/login-recovery/NewPassword";
 function LoginRecovery() {
   const [step, setStep] = useState(0);
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
 
   const handleEmailSubmit = (submittedEmail: string) => {
     setEmail(submittedEmail);
@@ -14,7 +13,7 @@ function LoginRecovery() {
   };
 
   const handleCodeSubmit = (submittedCode: string) => {
-    setCode(submittedCode);
+    // OTP verified, proceed to password step
     setStep(2);
   };
 
@@ -23,9 +22,13 @@ function LoginRecovery() {
       {step === 0 ? (
         <InsertEmail onSubmit={handleEmailSubmit} />
       ) : step === 1 ? (
-        <ConfirmCode onSubmit={handleCodeSubmit} onBack={() => setStep(0)} />
+        <ConfirmCode
+          email={email}
+          onSubmit={handleCodeSubmit}
+          onBack={() => setStep(0)}
+        />
       ) : (
-        <NewPassword email={email} code={code} onBack={() => setStep(1)} />
+        <NewPassword email={email} onBack={() => setStep(1)} />
       )}
     </section>
   );

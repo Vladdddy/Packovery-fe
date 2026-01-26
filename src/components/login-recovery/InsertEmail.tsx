@@ -45,9 +45,6 @@ function InsertEmail({ onSubmit }: InsertEmailProps) {
             Inserisci l'email del tuo account. Ti invieremo un codice per
             modificare la tua password.
           </h2>
-          {error && (
-            <div className="error-message animate-fade-in">{error}</div>
-          )}
           <div className="row animate-slide-right-delay-3">
             <label htmlFor="email">Email</label>
             <input
@@ -71,6 +68,9 @@ function InsertEmail({ onSubmit }: InsertEmailProps) {
               {loading ? "Invio..." : "Invia codice"}
             </button>
           </div>
+          {error && (
+            <div className="error-message animate-fade-in">{error}</div>
+          )}
         </form>
       </div>
     </div>

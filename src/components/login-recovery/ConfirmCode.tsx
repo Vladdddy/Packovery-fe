@@ -6,29 +6,45 @@ import {
   handleInputChange,
   handleKeyDown,
 } from "../../functions/LoginFunctions";
+import { authService } from "../../services/authService";
 
 interface ConfirmCodeProps {
+  email: string;
   onSubmit: (code: string) => void;
   onBack?: () => void;
 }
 
-function ConfirmCode({ onSubmit, onBack }: ConfirmCodeProps) {
+function ConfirmCode({ email, onSubmit, onBack }: ConfirmCodeProps) {
   const navigate = useNavigate();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     const code = inputRefs.current.map((input) => input?.value || "").join("");
 
     if (code.length !== 6) {
-      setError("Please enter all 6 digits");
+      setError("Inserisci tutte le 6 cifre");
       return;
     }
 
-    onSubmit(code);
+    setLoading(true);
+
+    try {
+      // Verify OTP with backend
+      await authService.verifyOtp({ email, otp: code });
+      // If successful, proceed to next step
+      onSubmit(code);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Codice non valido. Riprova.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -66,11 +82,14 @@ function ConfirmCode({ onSubmit, onBack }: ConfirmCodeProps) {
             <button
               type="button"
               className="secondary-btn"
-              onClick={() => navigate("/insert-email")}
+              onClick={() => navigate("/login")}
+              disabled={loading}
             >
               Annulla
             </button>
-            <button type="submit">Conferma</button>
+            <button type="submit" disabled={loading}>
+              {loading ? "Verifica..." : "Conferma"}
+            </button>
           </div>
         </form>
       </div>
