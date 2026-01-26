@@ -4,16 +4,15 @@ import InfoIcon from "../assets/icons/info.tsx";
 import { ordersService } from "../services/ordersService.ts";
 
 interface Order {
-    id: number;
     trackingCode: string;
-    creationDate: string;
-    deliveryCity: string | null;
-    deliveryProvince: string | null;
+    status: string;
     pickUpCity: string | null;
     pickUpProvince: string | null;
-    size: string;
-    status: string;
+    deliveryCity: string | null;
+    deliveryProvince: string | null;
     weight: string;
+    size: string;
+    creationDate: string;
 }
 
 interface OrdersTableProps {
@@ -28,10 +27,13 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
     const ITEMS_PER_PAGE = 10;
 
     // Calculate total pages based on actual number of orders
-    const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(
+        (Array.isArray(orders) ? orders.length : 0) / ITEMS_PER_PAGE,
+    );
 
     // Get orders for current page
     const getCurrentPageOrders = () => {
+        if (!Array.isArray(orders)) return [];
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
         const endIndex = startIndex + ITEMS_PER_PAGE;
         return orders.slice(startIndex, endIndex);
@@ -61,7 +63,7 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
 
     useEffect(() => {
         setHasAnimated(true);
-        if (searchedOrders) {
+        if (searchedOrders && Array.isArray(searchedOrders)) {
             // Display the searched orders
             setOrders(searchedOrders);
             setLoading(false);
@@ -192,7 +194,7 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
                         ) : (
                             getCurrentPageOrders().map((order, index) => (
                                 <tr
-                                    key={`${order.id}-${index}`}
+                                    key={`${order.trackingCode}-${index}`}
                                     className={hasAnimated ? "animate-row" : ""}
                                     style={
                                         hasAnimated
@@ -202,7 +204,7 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
                                             : {}
                                     }
                                 >
-                                    <td>{order.trackingCode || order.id}</td>
+                                    <td>{order.trackingCode}</td>
                                     <td>
                                         <span
                                             className={`status ${order.status?.toLowerCase().replace("_", "-") || ""}`}
