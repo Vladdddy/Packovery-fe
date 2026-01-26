@@ -966,6 +966,12 @@
   padding: 4px 6px;
 }
 
+/* Hide frontend read-status ticks and mark-read action per product decision */
+.read-status,
+.mark-read-link {
+  display: none !important;
+}
+
 /* Layout tweaks for communication block: spacing and button sizing */
 .order-field.rider-action {
   gap: 10px;

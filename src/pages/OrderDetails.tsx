@@ -574,10 +574,6 @@ function OrderDetails() {
                           <span className="meta-time">{m.messageSentTime ? new Date(m.messageSentTime).toLocaleString() : ''}</span>
                         </div>
                         <div className="meta-right">
-                          <span className={`read-status ${m.messageReadStatus ? 'read' : 'unread'}`}>{m.messageReadStatus ? '✓✓' : '✓'}</span>
-                          {!m.messageReadStatus && !fromMe && (
-                            <button className="mark-read-link" onClick={() => handleMarkAsRead(m)}>Segna come letto</button>
-                          )}
                         </div>
                       </div>
                       <div className="message-body">{m.messageContent}</div>
@@ -593,6 +589,7 @@ function OrderDetails() {
             </div>
             </div>
           </div>
+          </>
         )}
       </div>
     </section>
