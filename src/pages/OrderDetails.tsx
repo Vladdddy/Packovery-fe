@@ -45,9 +45,6 @@ function OrderDetails() {
   const [arrivalAddress, setArrivalAddress] = useState(
     "Via Cesare Battisti 1315, Cislago, 21040 VA",
   );
-  const [currentPositionCoords, setCurrentPositionCoords] = useState(
-    "45°30'51.1\"N 9°14'24.0\"E",
-  );
 
   const handleOrderChange = (field: string, value: string) => {
     setOrderData((prev) => ({ ...prev, [field]: value }));

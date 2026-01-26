@@ -2,7 +2,8 @@ import { authService } from "./authService";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
-interface Order {
+export interface Order {
+  id: string;
   trackingCode: string;
   status: string;
   pickUpCity: string | null;
@@ -12,13 +13,6 @@ interface Order {
   weight: string;
   size: string;
   creationDate: string;
-}
-
-interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
-  timestamp: string;
 }
 
 export const ordersService = {

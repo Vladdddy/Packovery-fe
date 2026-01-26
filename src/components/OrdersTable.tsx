@@ -3,24 +3,14 @@ import { useNavigate } from "react-router-dom";
 import "../styles/orders.css";
 import InfoIcon from "../assets/icons/info.tsx";
 import { ordersService } from "../services/ordersService.ts";
-
-interface Order {
-  trackingCode: string;
-  status: string;
-  pickUpCity: string | null;
-  pickUpProvince: string | null;
-  deliveryCity: string | null;
-  deliveryProvince: string | null;
-  weight: string;
-  size: string;
-  creationDate: string;
-}
+import type { Order } from "../services/ordersService.ts";
 
 interface OrdersTableProps {
   searchedOrders?: Order[];
 }
 
 function OrdersTable({ searchedOrders }: OrdersTableProps) {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [hasAnimated, setHasAnimated] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -53,6 +43,7 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
       setLoading(true);
       const data = await ordersService.fetchOrders();
       if (data) {
+        console.log("Orders received in OrdersTable:", data);
         setOrders(data);
       }
     } catch (error) {
@@ -212,7 +203,10 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
                   <td>{order.weight || "N/A"}</td>
                   <td>{order.size || "N/A"}</td>
                   <td>
-                    <button className="detail-button">
+                    <button
+                      className="detail-button"
+                      onClick={() => navigate(`/orders/${order.id}`)}
+                    >
                       <InfoIcon />
                     </button>
                   </td>
