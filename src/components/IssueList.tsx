@@ -33,8 +33,7 @@ export default function IssueList() {
 
   const handleResolve = async (notes: string) => {
     if (!selectedId) return;
-    // For now use adminId 1 as placeholder; ideally take from auth
-    await alertIssuesService.resolveIssue(selectedId, { adminId: 1, notes });
+    await alertIssuesService.resolveIssue(selectedId, { notes });
     // Refresh list
     const list = await alertIssuesService.getOpen();
     setIssues(list);

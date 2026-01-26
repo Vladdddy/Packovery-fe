@@ -20,10 +20,22 @@ export const alertIssuesService = {
     const data = await res.json();
     return (data || []).map((i: any) => ({
       id: String(i.id ?? i._id ?? i.uuid ?? i.uuidString ?? ""),
-      orderId: i.orderId ?? i.order?.id ?? i.orderIdStr,
-      alertName: i.alertName ?? i.name,
-      type: i.type ?? (i.alertType ? String(i.alertType) : undefined),
-      createdAt: i.createdAt ?? i.created ?? i.time,
+      orderId: i.issueRelatedOrderId ?? i.orderId ?? i.order?.id ?? i.orderIdStr,
+      alertName: i.snapshotAlertName ?? i.alertName ?? i.name,
+      type: i.snapshotAlertType ?? i.type ?? (i.alertType ? String(i.alertType) : undefined),
+      createdAt:
+        // Backend provides Instant in `issueCreationTime` (ISO-8601). Format to `HH:mm`.
+        (function () {
+          const ts = i.issueCreationTime ?? i.createdAt ?? i.created ?? i.time;
+          if (!ts) return "";
+          try {
+            const d = new Date(ts);
+            if (isNaN(d.getTime())) return "";
+            return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+          } catch (e) {
+            return String(ts);
+          }
+        })(),
       notes: i.notes,
       adminId: i.adminId,
       status: i.status,
@@ -54,8 +66,9 @@ export const alertIssuesService = {
     }
   },
 
-  async resolveIssue(id: string, payload: { adminId: number; notes?: string }) {
-    const body = { adminId: payload.adminId, notes: payload.notes };
+  async resolveIssue(id: string, payload: { notes?: string }) {
+    // Backend reads admin id from JWT token; only send notes in body
+    const body = { notes: payload.notes };
     const res = await authService.fetchWithAuth(`${API_BASE_URL}/alert-issues/${id}/resolve`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
