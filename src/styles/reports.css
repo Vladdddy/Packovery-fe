@@ -132,7 +132,7 @@
 .pv-modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.35);
+    background: rgba(0, 0, 0, 0.35);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -145,7 +145,7 @@
     max-width: 680px;
     background: var(--white);
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(11,22,39,0.12);
+    box-shadow: 0 10px 30px rgba(11, 22, 39, 0.12);
     padding: 20px;
     border: 1px solid var(--light-grey);
     color: var(--black);
@@ -153,8 +153,14 @@
 }
 
 @keyframes modalPop {
-    from { transform: translateY(8px) scale(0.995); opacity: 0; }
-    to { transform: translateY(0) scale(1); opacity: 1; }
+    from {
+        transform: translateY(8px) scale(0.995);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
 }
 
 .pv-modal h3 {
@@ -190,6 +196,42 @@
     border: none;
 }
 
+/* Actions row: make both buttons equal width */
+.pv-modal .modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+.pv-modal .modal-actions .back-btn,
+.pv-modal .modal-actions .confirm-btn {
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+    background-color: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-size: var(--paragraph-m);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: var(--primary-hover);
+    }
+}
+
+.pv-modal .modal-actions .back-btn {
+    background-color: var(--light);
+    color: var(--black);
+    border: 1px solid var(--light-grey);
+
+    &:hover {
+        background-color: var(--bento-bg);
+    }
+}
+
 @media (max-width: 520px) {
     .pv-modal {
         max-width: 100%;
@@ -202,23 +244,10 @@
     }
 
     /* Keep actions equal width on small screens as well */
-    .pv-modal .modal-actions .secondary-btn,
-    .pv-modal .modal-actions .btn {
+    .pv-modal .modal-actions .back-btn,
+    .pv-modal .modal-actions .confirm-btn {
         flex: 1;
         padding: 10px 12px;
+        height: 40px;
     }
-}
-
-/* Actions row: make both buttons equal width */
-.pv-modal .modal-actions {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-    margin-top: 12px;
-}
-
-.pv-modal .modal-actions .secondary-btn,
-.pv-modal .modal-actions .btn {
-    flex: 1;
-    min-width: 0;
 }
