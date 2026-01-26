@@ -27,27 +27,9 @@ function OrderDetails() {
     transport: "",
   });
 
-  // Location states
-  const [departureLocation, setDepartureLocation] = useState<
-    [number, number] | null
-  >([45.4642, 9.19]);
-  const [arrivalLocation, setArrivalLocation] = useState<
-    [number, number] | null
-  >([45.5642, 9.29]);
-  const [currentPosition] = useState<[number, number] | null>([45.5142, 9.24]);
   const [selectionMode, setSelectionMode] = useState<
     "departure" | "arrival" | null
   >(null);
-
-  const [departureAddress, setDepartureAddress] = useState(
-    "Via Garibaldi 27, Busto Arsizio, 21052, VA",
-  );
-  const [arrivalAddress, setArrivalAddress] = useState(
-    "Via Cesare Battisti 1315, Cislago, 21040 VA",
-  );
-  const [currentPositionCoords, setCurrentPositionCoords] = useState(
-    "45°30'51.1\"N 9°14'24.0\"E",
-  );
 
   const handleOrderChange = (field: string, value: string) => {
     setOrderData((prev) => ({ ...prev, [field]: value }));
@@ -58,33 +40,8 @@ function OrderDetails() {
   };
 
   const handleMapClick = (latlng: [number, number]) => {
-    if (selectionMode === "departure") {
-      setDepartureLocation(latlng);
-      setDepartureAddress(`${latlng[0].toFixed(6)}, ${latlng[1].toFixed(6)}`);
-      setSelectionMode(null);
-    } else if (selectionMode === "arrival") {
-      setArrivalLocation(latlng);
-      setArrivalAddress(`${latlng[0].toFixed(6)}, ${latlng[1].toFixed(6)}`);
-      setSelectionMode(null);
-    }
-  };
-
-  const formatCoordinates = (coords: [number, number] | null): string => {
-    if (!coords) return "";
-    const lat = coords[0];
-    const lng = coords[1];
-
-    const latDeg = Math.floor(Math.abs(lat));
-    const latMin = Math.floor((Math.abs(lat) - latDeg) * 60);
-    const latSec = (((Math.abs(lat) - latDeg) * 60 - latMin) * 60).toFixed(1);
-    const latDir = lat >= 0 ? "N" : "S";
-
-    const lngDeg = Math.floor(Math.abs(lng));
-    const lngMin = Math.floor((Math.abs(lng) - lngDeg) * 60);
-    const lngSec = (((Math.abs(lng) - lngDeg) * 60 - lngMin) * 60).toFixed(1);
-    const lngDir = lng >= 0 ? "E" : "W";
-
-    return `${latDeg}°${latMin}'${latSec}"${latDir} ${lngDeg}°${lngMin}'${lngSec}"${lngDir}`;
+    // Map click handler can be used for future features if needed
+    console.log("Map clicked:", latlng);
   };
 
   return (
@@ -108,33 +65,11 @@ function OrderDetails() {
           <section className="map-section">
             <div className="map-container">
               <Map
-                departure={departureLocation}
-                arrival={arrivalLocation}
-                currentPosition={currentPosition}
+                orderId={id ? parseInt(id) : undefined}
+                autoRefresh={true}
+                refreshInterval={30000}
                 onMapClick={handleMapClick}
-                selectionMode={selectionMode}
               />
-            </div>
-
-            <div className="location-info-grid">
-              <div className="location-info-card">
-                <h3 className="location-title">Luogo di partenza</h3>
-                <p className="location-address">{departureAddress}</p>
-              </div>
-
-              <div className="location-info-card">
-                <h3 className="location-title">Posizione attuale</h3>
-                <p className="location-address">
-                  {currentPosition
-                    ? `${currentPosition[0].toFixed(6)}, ${currentPosition[1].toFixed(6)}`
-                    : "Non disponibile"}
-                </p>
-              </div>
-
-              <div className="location-info-card">
-                <h3 className="location-title">Luogo di arrivo</h3>
-                <p className="location-address">{arrivalAddress}</p>
-              </div>
             </div>
           </section>
 

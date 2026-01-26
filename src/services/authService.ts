@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 interface LoginRequest {
   email: string;
@@ -17,10 +17,12 @@ interface LoginResponse {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface RefreshTokenRequest {
   refreshToken: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ForgotPasswordRequest {
   email: string;
 }
@@ -34,41 +36,41 @@ interface ResetPasswordRequest {
 export const authService = {
   async login(data: LoginRequest): Promise<LoginResponse> {
     const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
 
     if (!response.ok) {
-      let errorMessage = 'Login failed';
+      let errorMessage = "Login failed";
       try {
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
           const error = await response.json();
           errorMessage = error.message || error.error || JSON.stringify(error);
-          console.error('Login error response:', error);
+          console.error("Login error response:", error);
         } else {
           const text = await response.text();
           errorMessage = text || `Server error: ${response.status}`;
-          console.error('Login error text:', text);
+          console.error("Login error text:", text);
         }
       } catch (e) {
         errorMessage = `Server error: ${response.status}`;
-        console.error('Error parsing response:', e);
+        console.error("Error parsing response:", e);
       }
       throw new Error(errorMessage);
     }
 
     const result = await response.json();
-    
+
     // Store tokens in localStorage
     if (result.accessToken) {
-      localStorage.setItem('accessToken', result.accessToken);
+      localStorage.setItem("accessToken", result.accessToken);
     }
     if (result.refreshToken) {
-      localStorage.setItem('refreshToken', result.refreshToken);
+      localStorage.setItem("refreshToken", result.refreshToken);
     }
 
     return result;
@@ -76,74 +78,119 @@ export const authService = {
 
   async refreshToken(refreshToken: string): Promise<LoginResponse> {
     const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ refreshToken }),
     });
 
     if (!response.ok) {
-      throw new Error('Token refresh failed');
+      throw new Error("Token refresh failed");
     }
 
     const result = await response.json();
-    
+
     // Update tokens in localStorage
     if (result.accessToken) {
-      localStorage.setItem('accessToken', result.accessToken);
+      localStorage.setItem("accessToken", result.accessToken);
     }
     if (result.refreshToken) {
-      localStorage.setItem('refreshToken', result.refreshToken);
+      localStorage.setItem("refreshToken", result.refreshToken);
     }
 
     return result;
   },
 
   async requestPasswordReset(email: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/request-reset-password`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `${API_BASE_URL}/api/auth/request-reset-password`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
       },
-      body: JSON.stringify({ email }),
-    });
+    );
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to request password reset');
+      throw new Error(error.message || "Failed to request password reset");
     }
   },
 
   async resetPassword(data: ResetPasswordRequest): Promise<void> {
     const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to reset password');
+      throw new Error(error.message || "Failed to reset password");
     }
   },
 
   logout() {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
   },
 
   getAccessToken(): string | null {
-    return localStorage.getItem('accessToken');
+    return localStorage.getItem("accessToken");
   },
 
   getRefreshToken(): string | null {
-    return localStorage.getItem('refreshToken');
+    return localStorage.getItem("refreshToken");
   },
 
   isAuthenticated(): boolean {
     return !!this.getAccessToken();
+  },
+
+  async fetchWithAuth(
+    url: string,
+    options: RequestInit = {},
+  ): Promise<Response> {
+    const accessToken = this.getAccessToken();
+
+    if (!accessToken) {
+      throw new Error("Not authenticated");
+    }
+
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${accessToken}`,
+    };
+
+    const response = await fetch(url, { ...options, headers });
+
+    // If unauthorized, try to refresh token
+    if (response.status === 401) {
+      const refreshToken = this.getRefreshToken();
+      if (refreshToken) {
+        try {
+          await this.refreshToken(refreshToken);
+          // Retry with new token
+          const newAccessToken = this.getAccessToken();
+          headers["Authorization"] = `Bearer ${newAccessToken}`;
+          return fetch(url, { ...options, headers });
+        } catch (error) {
+          this.logout();
+          window.location.href = "/login";
+          throw new Error("Session expired");
+        }
+      } else {
+        this.logout();
+        window.location.href = "/login";
+        throw new Error("Authentication required");
+      }
+    }
+
+    return response;
   },
 };

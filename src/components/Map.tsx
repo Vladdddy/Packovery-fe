@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import L from "leaflet";
 import {
   MapContainer,
@@ -6,7 +6,13 @@ import {
   Marker,
   Polyline,
   useMap,
+  Popup,
 } from "react-leaflet";
+import {
+  locationService,
+  type OrderLocation,
+  type RiderLocation,
+} from "../services/locationService";
 
 // Fix for default marker icons in React-Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -54,11 +60,15 @@ const currentIcon = new L.Icon({
 });
 
 interface MapComponentProps {
-  departure: [number, number] | null;
-  arrival: [number, number] | null;
-  currentPosition: [number, number] | null;
+  orderId?: number;
+  riderId?: number;
+  departure?: [number, number] | null;
+  arrival?: [number, number] | null;
+  currentPosition?: [number, number] | null;
   onMapClick?: (latlng: [number, number]) => void;
   selectionMode?: "departure" | "arrival" | null;
+  autoRefresh?: boolean;
+  refreshInterval?: number; // in milliseconds
 }
 
 // Component to handle map click events
@@ -116,11 +126,85 @@ function FitBounds({
 }
 
 export default function Map({
-  departure,
-  arrival,
-  currentPosition,
+  orderId,
+  riderId,
+  departure: propDeparture,
+  arrival: propArrival,
+  currentPosition: propCurrentPosition,
   onMapClick,
+  autoRefresh = false,
+  refreshInterval = 30000, // 30 seconds default
 }: MapComponentProps) {
+  const [orderLocation, setOrderLocation] = useState<OrderLocation | null>(
+    null,
+  );
+  const [riderLocation, setRiderLocation] = useState<RiderLocation | null>(
+    null,
+  );
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch order location
+  useEffect(() => {
+    if (!orderId) return;
+
+    const fetchOrderLocation = async () => {
+      try {
+        setError(null);
+        const data = await locationService.getOrderLocation(orderId);
+        setOrderLocation(data);
+      } catch (err) {
+        console.error("Failed to fetch order location:", err);
+        setError("Impossibile caricare la posizione dell'ordine");
+      }
+    };
+
+    fetchOrderLocation();
+  }, [orderId]);
+
+  // Fetch rider position
+  useEffect(() => {
+    if (!riderId) return;
+
+    const fetchRiderPosition = async () => {
+      try {
+        const data = await locationService.getRiderLastPosition(riderId);
+        setRiderLocation(data);
+      } catch (err) {
+        console.error("Failed to fetch rider position:", err);
+      }
+    };
+
+    fetchRiderPosition();
+
+    // Auto-refresh rider position if enabled
+    if (autoRefresh) {
+      const interval = setInterval(fetchRiderPosition, refreshInterval);
+      return () => clearInterval(interval);
+    }
+  }, [riderId, autoRefresh, refreshInterval]);
+
+  // Determine positions from fetched data first, then fall back to props
+  let departure: [number, number] | null = null;
+  let arrival: [number, number] | null = null;
+  let currentPosition: [number, number] | null = null;
+
+  // Prioritize database data over props
+  if (orderLocation) {
+    departure = [orderLocation.pickupLatitude, orderLocation.pickupLongitude];
+    arrival = [orderLocation.deliveryLatitude, orderLocation.deliveryLongitude];
+  } else {
+    // Fall back to props only if no database data
+    departure = propDeparture || null;
+    arrival = propArrival || null;
+  }
+
+  if (riderLocation) {
+    currentPosition = [riderLocation.latitude, riderLocation.longitude];
+  } else {
+    // Fall back to prop only if no database data
+    currentPosition = propCurrentPosition || null;
+  }
+
   // Default center (Italy)
   const defaultCenter: [number, number] = [45.4642, 9.19];
 
@@ -159,6 +243,26 @@ export default function Map({
         zIndex: 0,
       }}
     >
+      {error && (
+        <div
+          style={{
+            position: "absolute",
+            top: "10px",
+            left: "10px",
+            right: "10px",
+            zIndex: 1000,
+            background: "#fee",
+            border: "1px solid #fcc",
+            borderRadius: "8px",
+            padding: "10px",
+            color: "#c00",
+            fontSize: "14px",
+          }}
+        >
+          {error}
+        </div>
+      )}
+
       <MapContainer
         center={center}
         zoom={12}
@@ -172,12 +276,95 @@ export default function Map({
           maxZoom={19}
         />
 
-        {departure && <Marker position={departure} icon={departureIcon} />}
+        {departure && (
+          <Marker position={departure} icon={departureIcon}>
+            <Popup>
+              <strong>Punto di Ritiro</strong>
+              {orderLocation && (
+                <>
+                  <br />
+                  {orderLocation.pickupCity}, {orderLocation.pickupProvince}
+                  {orderLocation.streetAddress && (
+                    <>
+                      <br />
+                      {orderLocation.streetAddress}
+                    </>
+                  )}
+                  {orderLocation.desiredPickupTime && (
+                    <>
+                      <br />
+                      <em>
+                        Ritiro previsto:{" "}
+                        {new Date(
+                          orderLocation.desiredPickupTime,
+                        ).toLocaleString("it-IT")}
+                      </em>
+                    </>
+                  )}
+                </>
+              )}
+            </Popup>
+          </Marker>
+        )}
 
-        {arrival && <Marker position={arrival} icon={arrivalIcon} />}
+        {arrival && (
+          <Marker position={arrival} icon={arrivalIcon}>
+            <Popup>
+              <strong>Punto di Consegna</strong>
+              {orderLocation && (
+                <>
+                  <br />
+                  {orderLocation.deliveryCity}, {orderLocation.deliveryProvince}
+                  {orderLocation.plannedDeliveryTime && (
+                    <>
+                      <br />
+                      <em>
+                        Consegna prevista:{" "}
+                        {new Date(
+                          orderLocation.plannedDeliveryTime,
+                        ).toLocaleString("it-IT")}
+                      </em>
+                    </>
+                  )}
+                  {orderLocation.estimatedArrival && (
+                    <>
+                      <br />
+                      <em>
+                        Arrivo stimato:{" "}
+                        {new Date(
+                          orderLocation.estimatedArrival,
+                        ).toLocaleString("it-IT")}
+                      </em>
+                    </>
+                  )}
+                </>
+              )}
+            </Popup>
+          </Marker>
+        )}
 
         {currentPosition && (
-          <Marker position={currentPosition} icon={currentIcon} />
+          <Marker position={currentPosition} icon={currentIcon}>
+            <Popup>
+              <strong>Posizione Corriere</strong>
+              {riderLocation && (
+                <>
+                  <br />
+                  Ultimo aggiornamento:{" "}
+                  {new Date(riderLocation.positionTimestamp).toLocaleString(
+                    "it-IT",
+                  )}
+                  {riderLocation.distanceTraveled > 0 && (
+                    <>
+                      <br />
+                      Distanza percorsa:{" "}
+                      {(riderLocation.distanceTraveled / 1000).toFixed(2)} km
+                    </>
+                  )}
+                </>
+              )}
+            </Popup>
+          </Marker>
         )}
 
         {routePositions.length >= 2 && (
