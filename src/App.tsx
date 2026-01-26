@@ -10,21 +10,26 @@ import CreateAlert from "./pages/CreateAlert";
 import EditAlert from "./pages/EditAlert";
 import OrderDetails from "./pages/OrderDetails";
 import SearchOrder from "./pages/SearchOrder";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Orders />} />
-        <Route path="/orders" element={<Orders />} />
-        <Route path="/alerts" element={<Alerts />} />
-        <Route path="/alerts/create" element={<CreateAlert />} />
-        <Route path="/alerts/:id/edit" element={<EditAlert />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/reports" element={<Reports />} />
         <Route path="/recovery" element={<LoginRecovery />} />
-        <Route path="/orders/:id" element={<OrderDetails />} />
-        <Route path="/search-order" element={<SearchOrder />} />
+
+        <Route element={<PrivateRoute />}>
+          <Route path="/" element={<Orders />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/alerts" element={<Alerts />} />
+          <Route path="/alerts/create" element={<CreateAlert />} />
+          <Route path="/alerts/:id/edit" element={<EditAlert />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/orders/:id" element={<OrderDetails />} />
+          <Route path="/search-order" element={<SearchOrder />} />
+        </Route>
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
