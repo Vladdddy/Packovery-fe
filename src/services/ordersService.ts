@@ -59,7 +59,7 @@ export const ordersService = {
 
     // Extract data from the response wrapper
     let orders = result;
-    
+
     // Check if response has a data field (ApiResponse structure)
     if (result.data) {
       orders = result.data;
