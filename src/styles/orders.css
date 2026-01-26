@@ -9,6 +9,14 @@
     margin-bottom: 20px;
 }
 
+.btn-danger {
+    background-color: #dc3545 !important;
+}
+
+.btn-danger:hover {
+    background-color: #c82333 !important;
+}
+
 .orders-table-container {
     background: var(--white);
     border-radius: 10px;
@@ -129,14 +137,27 @@
     font-weight: 500;
 }
 
-.status.in-transito {
+.status.pending,
+.status.assigned {
+    background-color: #f3f4f6;
+    color: #666;
+}
+
+.status.in-transit {
     background-color: #e0f2fe;
     color: #0369a1;
 }
 
-.status.in-attesa {
-    background-color: #fef3c7;
-    color: #92400e;
+.status.failed,
+.status.cancelled,
+.status.returned {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.status.delivered {
+    background-color: #d1fae5;
+    color: #065f46;
 }
 
 .detail-button {
