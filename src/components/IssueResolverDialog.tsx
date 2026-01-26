@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Props {
   open: boolean;
@@ -10,16 +10,25 @@ export default function IssueResolverDialog({ open, onClose, onResolve }: Props)
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
   if (!open) return null;
 
   return (
-    <div className="pv-modal-backdrop">
-      <div className="pv-modal">
+    <div className="pv-modal-backdrop" role="presentation" onClick={onClose}>
+      <div className="pv-modal" role="dialog" aria-modal="true" aria-label="Risolvi segnalazione" onClick={(e) => e.stopPropagation()}>
         <h3>Risolvi Segnalazione</h3>
         <label className="pv-label">Note</label>
         <textarea className="pv-textarea" value={notes} onChange={(e) => setNotes(e.target.value)} />
 
-        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 12 }}>
+        <div className="modal-actions">
           <button className="secondary-btn" onClick={onClose} disabled={loading}>
             Annulla
           </button>
@@ -39,7 +48,7 @@ export default function IssueResolverDialog({ open, onClose, onResolve }: Props)
             }}
             disabled={loading}
           >
-            {loading ? "..." : "Conferma risoluzione"}
+            {loading ? "..." : "Conferma"}
           </button>
         </div>
       </div>
