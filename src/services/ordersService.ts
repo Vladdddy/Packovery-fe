@@ -1,16 +1,22 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 interface Order {
-    id: number;
     trackingCode: string;
-    creationDate: string;
-    deliveryCity: string | null;
-    deliveryProvince: string | null;
+    status: string;
     pickUpCity: string | null;
     pickUpProvince: string | null;
-    size: string;
-    status: string;
+    deliveryCity: string | null;
+    deliveryProvince: string | null;
     weight: string;
+    size: string;
+    creationDate: string;
+}
+
+interface ApiResponse<T> {
+    success: boolean;
+    message: string;
+    data: T;
+    timestamp: string;
 }
 
 export const ordersService = {
@@ -52,9 +58,9 @@ export const ordersService = {
             throw new Error(`Error fetching orders: ${response.statusText}`);
         }
 
-        const data: Order[] = await response.json();
+        const apiResponse: ApiResponse<Order[]> = await response.json();
 
-        return data;
+        return apiResponse.data || [];
     },
 
     async getOrderById(id: string): Promise<Order[]> {
