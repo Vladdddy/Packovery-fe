@@ -818,3 +818,392 @@
 .location-meta-info { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
 .meta-text { font-size: 0.85rem; color: #666; margin: 0; }
 .meta-label { font-weight: 600; color: #444; }
+
+/* Communication thread styles (improved) */
+.communication-thread {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--light-grey);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+  background: var(--bento-bg);
+  font-family: inherit;
+  font-size: var(--paragraph-s);
+  color: var(--black);
+}
+/* Remove extra gap when thread is inside chat drawer so footer covers correctly */
+.chat-drawer .communication-thread {
+  margin-bottom: 0; /* footer provides separation */
+  padding-bottom: 6px; /* small padding so content doesn't touch footer */
+}
+
+.message {
+  padding: 12px 88px 12px 14px; /* taller vertical padding and more right reserve */
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background: var(--white);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  border: 1px solid var(--light-grey);
+  font-family: inherit;
+  color: var(--black);
+  word-break: break-word;
+  position: relative;
+  min-height: 48px; /* ensure one-line messages not too cramped */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: visible !important; /* ensure short messages are not scrollable */
+}
+  padding: 10px 14px; /* increased padding for better appearance */
+  margin-bottom: 10px; /* increased margin for better spacing */
+  overflow: visible; /* prevent inner scrollbars for short messages */
+
+.message.from-me {
+  background: var(--primary);
+  color: var(--white);
+  text-align: right;
+}
+
+.message.from-rider {
+  background: var(--white);
+  color: var(--black);
+  text-align: left;
+}
+
+.message.unread {
+  border-left: none;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.02);
+}
+
+.message.read {
+  opacity: 0.95;
+}
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.meta-left {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1;
+  font-family: inherit;
+}
+
+.meta-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  font-family: inherit;
+  /* position to the right inside the message box */
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  flex-shrink: 0;
+  /* prevent the meta area itself from getting a scrollbar */
+  overflow: visible !important;
+}
+
+.meta-author {
+  font-weight: 600;
+  font-size: var(--paragraph-s);
+  color: var(--black);
+  font-family: inherit;
+}
+
+.meta-time {
+  font-size: var(--paragraph-s);
+  color: var(--grey);
+  font-family: inherit;
+}
+
+.read-status {
+  font-size: 13px;
+  color: var(--primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.02);
+}
+
+.read-status.read {
+  background: rgba(0,0,0,0.03);
+}
+
+.message-body {
+  font-size: var(--paragraph-s);
+  color: var(--black);
+  font-family: inherit;
+  margin: 0;
+  line-height: 1.4;
+  overflow: visible !important; /* avoid internal scrollbars for short content */
+}
+
+.contact-textarea {
+  resize: vertical;
+  min-height: 64px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding: 10px;
+  font-family: inherit;
+  font-size: var(--paragraph-s);
+}
+
+.mark-read-link {
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: var(--paragraph-s);
+  font-family: inherit;
+  padding: 4px 6px;
+}
+
+/* Layout tweaks for communication block: spacing and button sizing */
+.order-field.rider-action {
+  gap: 10px;
+}
+
+/* Make the communications label match the section title (Informazioni sul rider) */
+.order-field.rider-action {
+  margin-top: 18px; /* separate from upper section */
+}
+
+.order-field.rider-action > .pv-label {
+  font-size: var(--title-s);
+  font-weight: 700;
+  color: var(--black);
+  display: block;
+  margin-top: 6px;
+  margin-bottom: 12px;
+}
+
+.communication-thread {
+  margin-bottom: 12px; /* small gap from textarea */
+}
+
+.contact-rider-btn {
+  height: 40px; /* match other primary buttons */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  font-weight: 600;
+  width: 100%;
+  font-family: inherit;
+  font-size: var(--paragraph-m);
+  color: var(--white);
+  background: var(--primary);
+  border: none;
+  border-radius: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .communication-thread {
+    max-height: 160px;
+    padding: 8px;
+  }
+  .message {
+    padding: 8px 12px 8px 12px;
+    margin-bottom: 8px;
+    font-size: var(--paragraph-s);
+    min-height: 48px;
+  }
+  .message-meta {
+    gap: 6px;
+  }
+  .meta-time { font-size: 11px; }
+  .contact-textarea { min-height: 80px; }
+  .contact-rider-btn { height: 44px; }
+  .meta-right { gap: 6px; }
+}
+
+@media (max-width: 768px) {
+  .order-field.rider-action {
+    margin-top: 12px;
+  }
+  .order-field.rider-action > .pv-label {
+    font-size: var(--title-s);
+    margin-top: 4px;
+    margin-bottom: 10px;
+  }
+}
+
+/* On narrower screens make the status/action inline (avoid absolute positioning) */
+@media (max-width: 900px) {
+  .message {
+    padding-right: 12px;
+  }
+  .meta-right {
+    position: static;
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+}
+
+/* Floating chat button and drawer styles */
+.chat-fab-wrapper {
+  position: fixed;
+  right: 20px;
+  bottom: 24px;
+  z-index: 1400;
+}
+
+.chat-fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--white);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  cursor: pointer;
+}
+
+.chat-drawer {
+  position: fixed;
+  right: 20px;
+  bottom: 96px;
+  width: 460px; /* wider so input fits next to send button */
+  max-height: 75vh;
+  background: var(--white);
+  border: 1px solid var(--light-grey);
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-drawer.open {
+  display: flex;
+}
+
+.chat-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--light-grey);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-title {
+  font-size: var(--paragraph-m);
+  font-weight: 700;
+  color: var(--black);
+}
+
+.chat-close {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.chat-body {
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-footer {
+  padding: 10px;
+  border-top: 1px solid var(--light-grey);
+  display: flex;
+  gap: 8px;
+  align-items: stretch; /* ensure children can stretch to equal height */
+  background: var(--white); /* ensure footer covers underlying thread background */
+}
+
+/* Make textarea and send button equal height and responsive */
+.chat-footer .contact-textarea {
+  /* Force a maximum visual height so rows or inherited rules can't expand it */
+  display: block !important;
+  height: 44px !important; /* enforced visual height */
+  min-height: 44px;
+  max-height: 44px !important; /* prevent expansion */
+  resize: vertical;
+  flex: 1 1 auto;
+  box-sizing: border-box;
+  line-height: 1.2;
+  padding: 6px 10px; /* slightly reduced padding to fit 44px */
+  margin: 0; /* remove extra margins that cause misalignment */
+  border-radius: 8px;
+  overflow-y: auto;
+  align-self: center; /* prevent stretching when button is taller */
+}
+
+.chat-footer .contact-rider-btn {
+  height: 44px; /* enforce 44px max for consistency */
+  max-height: 44px !important;
+  width: 128px;
+  flex: 0 0 auto;
+  align-self: center; /* center vertically within footer */
+  border-radius: 8px;
+  padding: 0 12px; /* reduce padding so content fits in 44px */
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .chat-drawer {
+    right: 12px;
+    left: 12px;
+    bottom: 80px;
+    width: auto;
+    max-height: 60vh;
+  }
+  .chat-fab {
+    right: 12px;
+    bottom: 12px;
+  }
+  .chat-footer .contact-textarea { height: 56px; }
+  .chat-footer .contact-rider-btn { height: 44px; width: 96px; }
+}
+
+/* Collapse order detail fields into a single column on narrower viewports */
+@media (max-width: 900px) {
+  .order-details-grid,
+  .order-section:has(.rider-action) .order-details-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  .order-field {
+    width: 100%;
+  }
+
+  .order-field.rider-action {
+    grid-column: 1 / -1;
+  }
+
+  .location-info-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Make message meta stack neatly on very narrow screens */
+  .message-meta {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .meta-right {
+    justify-content: flex-start;
+  }
+}
+

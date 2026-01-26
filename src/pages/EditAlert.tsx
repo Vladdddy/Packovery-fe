@@ -5,6 +5,7 @@ import "../styles/alerts.css";
 import Topbar from "../components/layout/Topbar";
 import BackArrow from "../assets/icons/back-arrow";
 import ArrowDropdown from "../assets/icons/dropdown-arrow";
+import { alertsService } from "../services/alertsService";
 
 const TYPES = [
   "Ritardo partenza ordine",
@@ -24,8 +25,21 @@ export default function EditAlert() {
   const [active, setActive] = useState(true);
 
   useEffect(() => {
-    // placeholder: load alert by id
-    // setName/fill states based on fetched data
+    // load alert by id
+    if (!id) return;
+    (async () => {
+      try {
+        const a = await alertsService.getAlert(id);
+        setName(a.name || "");
+        setDescription(a.description || "");
+        setType(a.type || TYPES[0]);
+        setTime(a.threshold || "00:00");
+        setActive(!!a.active);
+      } catch (e) {
+        console.error(e);
+        alert("Impossibile caricare l'alert");
+      }
+    })();
   }, [id]);
 
   function addMinutes(m: number) {
@@ -39,8 +53,22 @@ export default function EditAlert() {
   }
 
   function submit() {
-    // TODO: update API
-    navigate("/alerts");
+    (async () => {
+      if (!id) return;
+      try {
+        await alertsService.updateAlert(id, {
+          name,
+          description,
+          type,
+          threshold: time,
+          active,
+        });
+        navigate("/alerts");
+      } catch (e: any) {
+        console.error(e);
+        alert(e.message || "Errore durante l'aggiornamento dell'alert");
+      }
+    })();
   }
 
   return (

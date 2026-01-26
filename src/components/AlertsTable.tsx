@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "../assets/icons/edit.tsx";
 import DeleteIcon from "../assets/icons/bin.tsx";
+import { alertsService } from "../services/alertsService";
 
 interface Alerts {
     id: string;
@@ -18,52 +19,71 @@ function AlertsTable() {
     const [currentPage, setCurrentPage] = useState(1);
     const [hasAnimated, setHasAnimated] = useState(false);
     const totalPages = 2;
-
-    const [alerts, setAlerts] = useState<Alerts[]>([
-        {
-            id: "A0001",
-            name: "Alert1",
-            created: "18/12/2025",
-            type: "Ritardo consegna ordine",
-            threshold: "01:00",
-            state: "Attivo",
-        },
-        {
-            id: "A0002",
-            name: "Alert2",
-            created: "22/12/2025",
-            type: "Ritardo partenza ordine",
-            threshold: "02:00",
-            state: "Non attivo",
-        },
-        {
-            id: "A0003",
-            name: "Alert3",
-            created: "06/01/2026",
-            type: "Segnale GPS interrotto",
-            threshold: "00:30",
-            state: "Attivo",
-        },
-    ]);
+    const [alerts, setAlerts] = useState<Alerts[]>([]);
+    const [loading, setLoading] = useState(false);
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setHasAnimated(true);
     }, []);
 
+    useEffect(() => {
+        loadAlerts();
+    }, []);
+
+    async function loadAlerts() {
+        setLoading(true);
+        try {
+            const list = await alertsService.listAlerts();
+            // map API shape to local shape
+            const mapped = list.map((a, idx) => ({
+                id: a.id,
+                name: a.name,
+                created: a.created || "",
+                type: a.type,
+                threshold: a.threshold,
+                state: a.active ? "Attivo" : "Non attivo",
+            }));
+            setAlerts(mapped);
+        } catch (e) {
+            console.error(e);
+            // keep fallback empty
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const toggleAlertState = (alertId: string) => {
-        setAlerts((prevAlerts) =>
-            prevAlerts.map((alert) =>
-                alert.id === alertId
-                    ? {
-                          ...alert,
-                          state:
-                              alert.state === "Attivo"
-                                  ? "Non attivo"
-                                  : "Attivo",
-                      }
-                    : alert,
-            ),
-        );
+        (async () => {
+            const target = alerts.find((a) => a.id === alertId);
+            if (!target) return;
+            const newActive = target.state !== "Attivo";
+            try {
+                await alertsService.updateAlert(alertId, { active: newActive });
+                setAlerts((prev) =>
+                    prev.map((alert) =>
+                        alert.id === alertId
+                            ? { ...alert, state: newActive ? "Attivo" : "Non attivo" }
+                            : alert,
+                    ),
+                );
+            } catch (e) {
+                console.error(e);
+                alert("Impossibile aggiornare lo stato dell'alert");
+            }
+        })();
+    };
+
+    const handleDelete = (alertId: string) => {
+        (async () => {
+            if (!confirm("Confermi cancellazione alert?")) return;
+            try {
+                await alertsService.deleteAlert(alertId);
+                setAlerts((prev) => prev.filter((a) => a.id !== alertId));
+            } catch (e) {
+                console.error(e);
+                alert("Errore durante la cancellazione");
+            }
+        })();
     };
 
     const handlePageChange = (page: number) => {
@@ -123,7 +143,11 @@ function AlertsTable() {
                         </tr>
                     </thead>
                     <tbody>
-                        {alerts.map((a, index) => (
+                        {loading ? (
+                            <tr>
+                                <td colSpan={6}>Caricamento...</td>
+                            </tr>
+                        ) : alerts.map((a, index) => (
                             <tr
                                 key={a.id}
                                 className={hasAnimated ? "animate-row" : ""}
@@ -151,11 +175,7 @@ function AlertsTable() {
                                                         checked={
                                                             a.state === "Attivo"
                                                         }
-                                                        onChange={() =>
-                                                            toggleAlertState(
-                                                                a.id,
-                                                            )
-                                                        }
+                                                        onChange={() => toggleAlertState(a.id)}
                                                     />
                                                     <span className="pv-slider" />
                                                 </label>
@@ -173,6 +193,7 @@ function AlertsTable() {
                                         <button
                                             className="icon-btn"
                                             title="Delete"
+                                            onClick={() => handleDelete(a.id)}
                                         >
                                             <DeleteIcon />
                                         </button>

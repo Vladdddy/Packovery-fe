@@ -2,6 +2,7 @@ import "../styles/reports.css";
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
 import ReportRender from "../components/ReportRender";
+import IssueList from "../components/IssueList";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { authService } from "../services/authService";
@@ -19,15 +20,7 @@ function Reports() {
             <Sidebar currentPage="reports" />
             <div className="page-content">
                 <Topbar header="Segnalazioni Ricevute" btn={null} />
-                <div className="reports-page-content">
-                    <div className="list">
-                        <ReportRender />
-                        <ReportRender />
-                        <ReportRender />
-                        <ReportRender />
-                        <ReportRender />
-                    </div>
-                </div>
+                <IssueList />
             </div>
         </section>
     );

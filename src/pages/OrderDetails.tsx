@@ -1,7 +1,7 @@
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
 import { useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "../styles/orders.css";
 import "../styles/alerts.css";
 import BackArrow from "../assets/icons/back-arrow";
@@ -9,6 +9,9 @@ import Clock from "../assets/icons/clock";
 import Map from "../components/Map";
 import { ordersService } from "../services/ordersService";
 import type { OrderDetails as OrderDetailsType } from "../services/ordersService";
+import communicationService from "../services/communicationService";
+import type { RiderCommunication } from "../services/communicationService";
+import { authService } from "../services/authService";
 import { trackingService } from "../services/trackingService";
 import type { RiderLocation } from "../services/trackingService";
 
@@ -34,6 +37,12 @@ function OrderDetails() {
     null,
   );
   const [riderAddress, setRiderAddress] = useState<string | null>(null);
+
+  // Communication thread state
+  const [messages, setMessages] = useState<RiderCommunication[]>([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  const threadRef = useRef<HTMLDivElement | null>(null);
 
   const fetchAddress = async (lat: number, lng: number) => {
     try {
@@ -105,6 +114,8 @@ function OrderDetails() {
           // Fetch rider's current position if riderId is available
           if (order.riderId) {
             await updateRiderPosition(order.riderId);
+            // also load messages for this rider
+            await loadMessages(order.riderId);
           }
         } else {
           console.log("No order data returned");
@@ -118,6 +129,64 @@ function OrderDetails() {
 
     fetchOrderData();
   }, [id]);
+
+  // Load messages when riderId becomes available
+  const loadMessages = async (riderId: number) => {
+    try {
+      const msgs = await communicationService.getMessagesForRider(riderId);
+      setMessages(msgs || []);
+    } catch (e) {
+      console.error("Errore caricamento messaggi:", e);
+    }
+  };
+
+  useEffect(() => {
+    if (orderData?.riderId) {
+      loadMessages(orderData.riderId);
+    }
+  }, [orderData?.riderId]);
+
+  // Floating chat state
+  const [chatOpen, setChatOpen] = useState(false);
+  const chatScrollRef = useRef<HTMLDivElement | null>(null);
+
+  const toggleChat = async () => {
+    const willOpen = !chatOpen;
+    setChatOpen(willOpen);
+    if (willOpen && orderData?.riderId) {
+      await loadMessages(orderData.riderId);
+      // scroll to bottom after messages loaded
+      setTimeout(() => {
+        chatScrollRef.current?.scrollTo({ top: chatScrollRef.current.scrollHeight });
+      }, 150);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !orderData?.riderId) return;
+    try {
+      setSending(true);
+      await communicationService.sendMessage(orderData.riderId, newMessage.trim());
+      setNewMessage("");
+      await loadMessages(orderData.riderId);
+      threadRef.current?.scrollTo({ top: threadRef.current.scrollHeight, behavior: "smooth" });
+    } catch (e) {
+      console.error("Errore invio messaggio:", e);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleMarkAsRead = async (msg: RiderCommunication) => {
+    const id = msg.id || msg._id;
+    if (!id) return;
+    try {
+      await communicationService.markAsRead(id);
+      if (orderData?.riderId) await loadMessages(orderData.riderId);
+    } catch (e) {
+      console.error("Errore mark as read:", e);
+    }
+  };
 
   useEffect(() => {
     // Poll for rider position every 30 seconds if order has a riderId
@@ -444,6 +513,8 @@ function OrderDetails() {
                       </div>
                     </>
                   )}
+
+                  {/* Communication moved to floating chat button/drawer */}
                 </div>
               ) : (
                 <div className="order-details-grid">
@@ -463,6 +534,64 @@ function OrderDetails() {
             </div>
           </section>
         </main>
+        {/* Floating chat button and drawer (only if a rider is assigned) */}
+        {orderData?.riderId && (
+          <div className={`chat-fab-wrapper`}>
+            <button className="chat-fab" onClick={toggleChat} aria-label="Apri chat rider">
+            {/* simple chat icon */}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+
+            <div className={`chat-drawer ${chatOpen ? 'open' : ''}`} role="dialog" aria-hidden={!chatOpen}>
+            <div className="chat-header">
+              <div className="chat-title">Chat con il rider</div>
+              <button className="chat-close" onClick={toggleChat} aria-label="Chiudi chat">✕</button>
+            </div>
+
+            <div className="chat-body communication-thread" ref={chatScrollRef}>
+              {messages.length === 0 ? (
+                <p className="location-address" style={{ color: '#999' }}>Nessun messaggio</p>
+              ) : (
+                messages.map((m) => {
+                  const msgId = m.id || m._id || '';
+                  const fromMe = m.senderId === (() => {
+                    const t = authService.getAccessToken();
+                    if (!t) return -1;
+                    try {
+                      const p = JSON.parse(atob(t.split('.')[1]));
+                      return Number(p.userId || p.sub || -1);
+                    } catch { return -1; }
+                  })();
+                  return (
+                    <div key={msgId} className={`message ${fromMe ? 'from-me' : 'from-rider'} ${m.messageReadStatus ? 'read' : 'unread'}`}>
+                      <div className="message-meta">
+                        <div className="meta-left">
+                          <span className="meta-author">{fromMe ? 'Tu' : 'Rider'}</span>
+                          <span className="meta-time">{m.messageSentTime ? new Date(m.messageSentTime).toLocaleString() : ''}</span>
+                        </div>
+                        <div className="meta-right">
+                          <span className={`read-status ${m.messageReadStatus ? 'read' : 'unread'}`}>{m.messageReadStatus ? '✓✓' : '✓'}</span>
+                          {!m.messageReadStatus && !fromMe && (
+                            <button className="mark-read-link" onClick={() => handleMarkAsRead(m)}>Segna come letto</button>
+                          )}
+                        </div>
+                      </div>
+                      <div className="message-body">{m.messageContent}</div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <div className="chat-footer">
+              <textarea className="pv-input contact-textarea" placeholder="Scrivi un messaggio al rider..." value={newMessage} onChange={(e) => setNewMessage(e.target.value)} rows={2} />
+              <button className="contact-rider-btn" onClick={async () => { await handleSendMessage(); setTimeout(() => chatScrollRef.current?.scrollTo({ top: chatScrollRef.current.scrollHeight }), 150); }} disabled={sending}>{sending ? 'Invio...' : 'Invia'}</button>
+            </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
