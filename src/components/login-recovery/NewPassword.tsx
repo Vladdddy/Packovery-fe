@@ -9,7 +9,7 @@ interface NewPasswordProps {
   onBack?: () => void;
 }
 
-function NewPassword({ email, onBack }: NewPasswordProps) {
+function NewPassword({ email, onBack: _onBack }: NewPasswordProps) {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

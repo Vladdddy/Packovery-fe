@@ -43,7 +43,6 @@ function OrdersTable({ searchedOrders }: OrdersTableProps) {
       setLoading(true);
       const data = await ordersService.fetchOrders();
       if (data) {
-        console.log("Orders received in OrdersTable:", data);
         setOrders(data);
       }
     } catch (error) {
