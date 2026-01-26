@@ -14,7 +14,7 @@ interface ConfirmCodeProps {
   onBack?: () => void;
 }
 
-function ConfirmCode({ email, onSubmit, onBack }: ConfirmCodeProps) {
+function ConfirmCode({ email, onSubmit, onBack: _onBack }: ConfirmCodeProps) {
   const navigate = useNavigate();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [error, setError] = useState("");
