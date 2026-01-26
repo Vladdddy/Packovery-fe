@@ -5,10 +5,12 @@ function Topbar({
     header,
     btn,
     onClick,
+    btnClassName,
 }: {
     header: string;
     btn: string | null;
     onClick?: () => void;
+    btnClassName?: string;
 }) {
     return (
         <>
@@ -17,7 +19,10 @@ function Topbar({
                     <h1>{header}</h1>
                 </div>
                 {btn !== null ? (
-                    <button className="btn" onClick={onClick}>
+                    <button
+                        className={`btn ${btnClassName || ""}`}
+                        onClick={onClick}
+                    >
                         {btn}
                     </button>
                 ) : null}
