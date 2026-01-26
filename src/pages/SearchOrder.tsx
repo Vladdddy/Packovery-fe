@@ -71,11 +71,7 @@ function SearchOrder() {
         <section className="layout search-order-page">
             <Sidebar currentPage="orders" />
             <div className="page-content">
-                <Topbar
-                    header="Cerca Ordine"
-                    btn="Cerca Ordine"
-                    onClick={() => navigate("/search-order")}
-                />
+                <Topbar header="Cerca Ordine" btn={null} />
                 <main className="pv-main">
                     <div className="pv-main-header">
                         <button
