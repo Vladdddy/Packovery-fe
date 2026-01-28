@@ -370,9 +370,23 @@ export const authService = {
     // Success - Password set successfully
   },
 
-  logout() {
+  logout(): void {
+    const token = localStorage.getItem("accessToken");
+
+    if (token) {
+      fetch(`${API_BASE_URL}/api/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        },
+        keepalive: true 
+      }).catch(err => console.warn("Logout log failed", err));
+    }
+
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    
+    window.location.href = "/login";
   },
 
   getAccessToken(): string | null {
